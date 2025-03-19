@@ -172,3 +172,8 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+
+# Ignore model weights & checkpoints
+runs/       # YOLO training outputs
+*.pt        # PyTorch model files
+*.h5        # TensorFlow model files
