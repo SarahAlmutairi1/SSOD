@@ -1,4 +1,5 @@
 import os
+import csv
 import numpy as np
 import pybboxes as pyb
 from sklearn.metrics import confusion_matrix, classification_report, accuracy_score, precision_score, recall_score, average_precision_score
@@ -8,6 +9,7 @@ import matplotlib.patches as patches
 from ultralytics import YOLO
 from PIL import Image
 import main
+
 
 def evaluate_predictions(predictions_folder, ground_truth_folder, class_names):
     """
@@ -80,23 +82,17 @@ def evaluate_predictions(predictions_folder, ground_truth_folder, class_names):
     cm = confusion_matrix(y_true, y_pred, labels=list(range(len(class_names))))
 
     # Calculate precision, recall, F1-score, accuracy
-    print("Generating classification report and calculating accuracy...")
+    print("Generating classification report and calculating accuracy")
     report = classification_report(y_true, y_pred, labels=list(range(len(class_names))), target_names=class_names, zero_division=0)
-    accuracy = accuracy_score(y_true, y_pred)
-
-    # Calculate per-class accuracy
-    per_class_accuracy = np.diag(cm) / (np.sum(cm, axis=1) + 1e-8)  # Avoid division by zero
+    mean_precision = precision_score(y_true, y_pred, average='macro', zero_division=0)
+    mean_recall = recall_score(y_true, y_pred, average='macro', zero_division=0)
+    mean_f1 = f1_score(y_true, y_pred, average='macro', zero_division=0)
 
     # Print metrics
     print("Classification Report:\n", report)
-    print("Overall Accuracy:", accuracy)
 
     # Plot the confusion matrix
     plt.figure(figsize=(10, 8))
-
-    # Convert results to text format
-    results_text = f"Classification Report:\n{report}\nOverall Accuracy: {accuracy:.4f}\n"
-
     sns.heatmap(cm,
                 annot=True,       # Annotate each cell with the numerical value
                 fmt='g',           # Format the annotation text
@@ -112,14 +108,17 @@ def evaluate_predictions(predictions_folder, ground_truth_folder, class_names):
     plt.gca().xaxis.tick_top()
     plt.gca().figure.subplots_adjust(bottom=0.2)
     plt.show()
-    fig = plt.gcf()  # Get the current figure
 
-    return results_text, fig
+    return {
+        "precision": mean_precision,
+        "recall": mean_recall,
+        "f1_score": mean_f1
+    }
 
 def save_evaluation_results(iteration, results_text, cm_plot):
     """Save evaluation results and confusion matrix plot."""
 
-    eval_dir = os.path.join(main.HOME, f"evaluation_results/iteration_{iteration}")
+    eval_dir = os.path.join(HOME, f"evaluation_results/iteration_{iteration}")
     os.makedirs(eval_dir, exist_ok=True)
 
     # Save text results
@@ -130,9 +129,21 @@ def save_evaluation_results(iteration, results_text, cm_plot):
     cm_plot.savefig(os.path.join(eval_dir, "confusion_matrix.png"))
     plt.close(cm_plot)
 
+def evaluate_final_model(model,dataset, img_size):
+  model = YOLO(model)
+  result = model.val(data=f'{dataset}/data.yaml', split='test')
+
+  # Extract metrics
+  res = result.mean_results()
+  metrics = {
+      "precision": res[0],   # Mean precision over all classes
+      "recall": res[1],      # Mean recall over all classes
+      "mAP50": res[2],           # mAP at 0.5 IoU
+      "mAP50-95": res[3]          # mAP over range 0.5:0.95 IoU
+  }
+
+  return metrics
     
-
-
 def visualize_predictions(image_path, predictions, image_width, image_height):
     """
     Visualize the image with bounding boxes.
@@ -166,7 +177,3 @@ def visualize_predictions(image_path, predictions, image_width, image_height):
 
     # Display the image
     plt.show()
-
-def evaluate_final_model(model,dataset, img_size):
-  model = YOLO(model)
-  result = model.val(data=f'{dataset}/data.yaml', split='test')
