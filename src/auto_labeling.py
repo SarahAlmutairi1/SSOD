@@ -194,6 +194,7 @@ def save_predictions(predictions, output_folder, image_width, image_height):
               f.write(f"{class_id} {bbox_str}\n")
 
 import glob
+from IPython.display import clear_output
 def iterative_auto_labeling(main_dataset_dir, num_images_per_instance, num_instances, epochs_per_iteration, img_size, class_names ,threshold_val= 0.5, ScoreBased = True, ScoreThreshold = 0.6):
     iteration = 0
     images_per_iteration = num_images_per_instance*num_instances
@@ -211,7 +212,7 @@ def iterative_auto_labeling(main_dataset_dir, num_images_per_instance, num_insta
       os.makedirs(dest_root_folder)
 
     # distribute dataset in seperate folders for training
-    remaining_unlabeled_images, distributed_datasets = preprocess.distribute_dataset(main_dataset_dir, dest_root_folder, num_images_per_instance*0.9, num_images_per_instance*0.1, num_instances, False)
+    remaining_unlabeled_images, distributed_datasets = distribute_dataset(main_dataset_dir, dest_root_folder, num_images_per_instance*0.9, num_images_per_instance*0.1, num_instances, False)
 
     # Save the initial split to merge it later with the final dataset
     manually_labeled_folder = os.path.join(HOME, "manually_labeled_folder")
@@ -247,7 +248,7 @@ def iterative_auto_labeling(main_dataset_dir, num_images_per_instance, num_insta
             source_folders_to_merge.append(val_folder)
 
     # Merge the datasets from the collected folders
-    preprocess.merge_datasets(source_folders_to_merge, manually_labeled_folder_merged)
+    merge_datasets(source_folders_to_merge, manually_labeled_folder_merged)
     shutil.rmtree(manually_labeled_folder)
 
     print(f'distributed_datasets {distributed_datasets}')
@@ -288,11 +289,12 @@ def iterative_auto_labeling(main_dataset_dir, num_images_per_instance, num_insta
 
         # Train each YOLO model using the distributed datasets
         print("Training YOLO models...")
-        best_model_paths, model_performance = train.train_multiple_instances(distributed_datasets_folders, epochs_per_iteration, best_models, img_size)
+        %cd {HOME}
+        best_model_paths, model_performance = train_multiple_instances(distributed_datasets_folders, epochs_per_iteration, best_models)
         print(f'best model paths: {best_model_paths}')
         print(f'Training iteration #{iteration}')
         print(f'model_performance: {model_performance}')
-        train.check_model_paths(best_model_paths)
+        check_model_paths(best_model_paths)
         best_models = best_model_paths
 
         # Check models' performance, if all have mAP >= 0.8, no need to split the data and train the models again.
@@ -313,24 +315,17 @@ def iterative_auto_labeling(main_dataset_dir, num_images_per_instance, num_insta
         iteration_folder_name = f'unlabeled_dataset_{iteration}'
         iteration_folder_path = os.path.join(HOME, iteration_folder_name)
 
-        unlabeled_dataset = preprocess.move_images(remaining_unlabeled_images, iteration_folder_path, images_per_iteration)
+        unlabeled_dataset = move_images(remaining_unlabeled_images, iteration_folder_path, images_per_iteration)
         del iteration_folder_name
         del iteration_folder_path
 
 
         # Auto-annotate the next set of unlabeled images
-        Pseudo_labels_folders = train.Pseudo_Labeling(best_model_paths, unlabeled_dataset, iteration)
+        Pseudo_labels_folders = Pseudo_Labeling(best_model_paths, unlabeled_dataset, iteration)
 
         # Process the predictions from the Pseudo Labeling
         print("Processing final predictions...")
         final_predictions = process_predictions(Pseudo_labels_folders, image_width = img_size, image_height = img_size, iou_threshold = threshold_val, ScoreBased = False, ScoreThreshold = 0.6 )
-
-        # Evaluate and save the quality of the final Pseudo-labels
-        print(f"Evaluating final Pseudo-labels #{iteration}")
-        output_folder_Pseudo = f"/content/final_Pseudo_labels/iteration{iteration}"
-        save_predictions(final_predictions, output_folder_Pseudo, image_width = img_size, image_height = img_size)
-        results_text, cm_plot = evaluate.evaluate_predictions(output_folder_Pseudo, ground_truth_folder, class_names)
-        evaluate.save_evaluation_results(iteration, results_text, cm_plot)
 
         final_predictions_list.append(final_predictions)
 
@@ -348,7 +343,6 @@ def iterative_auto_labeling(main_dataset_dir, num_images_per_instance, num_insta
           print("Not enough auto-annotated labels to continue.")
           break
 
-
         # Define the auto-annotated folder name for the current iteration
         iteration_auto_annotated_folder_name = f'auto_annotated_{iteration}'
         iteration_auto_annotated_folder_path = os.path.join(HOME, auto_annotated_folders ,iteration_auto_annotated_folder_name)
@@ -357,7 +351,7 @@ def iterative_auto_labeling(main_dataset_dir, num_images_per_instance, num_insta
         print("Updating unlabeled data ...")
         print(f'before updating unlabeled images folder, {len(os.listdir(unlabeled_dataset))}')
         print(f'before output folder has {len(os.listdir(output_folder))} labels')
-        Auto_annotated_folder = preprocess.update_unlabeled_folder(unlabeled_dataset, unlabeled_images_folder, output_folder, iteration_auto_annotated_folder_path)
+        Auto_annotated_folder = update_unlabeled_folder(unlabeled_dataset, unlabeled_images_folder, output_folder, iteration_auto_annotated_folder_path)
         num_remaining_unlabeled_images = sum(os.path.isfile(os.path.join(unlabeled_images_folder, f)) for f in os.listdir(unlabeled_images_folder))
         print(f'after updating unlabeled images folder, {len(os.listdir(unlabeled_dataset))}')
 
@@ -377,7 +371,7 @@ def iterative_auto_labeling(main_dataset_dir, num_images_per_instance, num_insta
         #update the distributed folder using the auto-annotated data
         print("Creating distributed folder...")
         print(f'num_images_per_instance: {num_images_per_instance}')
-        distributed_datasets = preprocess.distribute_dataset(Auto_annotated_folder, dest_root_folder, num_images_per_instance*0.9, num_images_per_instance*0.1, num_instances, True)
+        distributed_datasets = distribute_dataset(Auto_annotated_folder, dest_root_folder, num_images_per_instance*0.9, num_images_per_instance*0.1, num_instances, True)
         print(f'distributed_datasets {distributed_datasets}')
 
         # Get a list of the distributed datasets directories
@@ -398,18 +392,11 @@ def iterative_auto_labeling(main_dataset_dir, num_images_per_instance, num_insta
       print(f"if 1: EXIT While loop")
 
       # Auto-annotate the next set of unlabeled images
-      Pseudo_labels_folders = train.Pseudo_Labeling(best_model_paths, unlabeled_images_folder, iteration)
+      Pseudo_labels_folders = Pseudo_Labeling(best_model_paths, unlabeled_images_folder, iteration)
 
       # Process the predictions from the Pseudo Labeling
       print("Processing predictions...")
       final_predictions = process_predictions(Pseudo_labels_folders, image_width = img_size, image_height = img_size, iou_threshold = threshold_val, ScoreBased = False, ScoreThreshold = 0.6 )
-
-      # Evaluate and save the quality of the final Pseudo-labels
-      print(f"Evaluating final Pseudo-labels #{iteration}")
-      output_folder_Pseudo = f"/content/final_Pseudo_labels/iteration{iteration}"
-      save_predictions(final_predictions, output_folder_Pseudo, image_width = img_size, image_height = img_size)
-      results_text, cm_plot = evaluate.evaluate_predictions(output_folder_Pseudo, ground_truth_folder, class_names)
-      evaluate.save_evaluation_results(iteration, results_text, cm_plot)
 
       final_predictions_list.append(final_predictions)
       print(f'number of final predictions is {len(final_predictions)}')
@@ -426,7 +413,7 @@ def iterative_auto_labeling(main_dataset_dir, num_images_per_instance, num_insta
       #update the unlabeled data
       print("Updating unlabeled data ...")
       print(f'before updating unlabeled images folder, {num_remaining_unlabeled_images}')
-      Auto_annotated_folder = preprocess.update_unlabeled_folder( unlabeled_images_folder, unlabeled_images_folder, output_folder, iteration_auto_annotated_folder_path, True)
+      Auto_annotated_folder = update_unlabeled_folder( unlabeled_images_folder, unlabeled_images_folder, output_folder, iteration_auto_annotated_folder_path, True)
       num_remaining_unlabeled_images = sum(os.path.isfile(os.path.join(unlabeled_images_folder, f)) for f in os.listdir(unlabeled_images_folder))
       num_auto_annotated_labels = sum(os.path.isfile(os.path.join(Auto_annotated_folder, f)) for f in os.listdir(Auto_annotated_folder))
       print(f'list of auto_annotated labels is {num_auto_annotated_labels}')
@@ -449,14 +436,32 @@ def iterative_auto_labeling(main_dataset_dir, num_images_per_instance, num_insta
       merged_folder = "/content/merged_folder"
       os.makedirs(merged_folder, exist_ok=True)
 
-      preprocess.merge_datasets(auto_annotated_datasets_folders, merged_folder)
+      merge_datasets(auto_annotated_datasets_folders, merged_folder)
       print("Auto-annotated dataset prepared.")
 
+      # Preparing the final auto annotated datasets
       Final_output_folder = "/content/Final_auto_annotated_dataset"
+      if os.path.exists(Final_output_folder):
+        shutil.rmtree(Final_output_folder)
       os.makedirs(Final_output_folder, exist_ok=True)
 
-      preprocess.resplit_dataset(merged_folder, Final_output_folder, train_ratio = 0.9, test_ratio = 0.0, val_ratio= 0.1, seed=42)
+      resplit_dataset(merged_folder, Final_output_folder, train_ratio = 0.9, test_ratio = 0.0, val_ratio= 0.1, seed=42)
       print("Dataset Ready")
+
+      # remove all folders creates except Final output folder
+      shutil.rmtree(distributed_datasets)
+      shutil.rmtree(remaining_unlabeled_images)
+      shutil.rmtree(auto_annotated_folders)
+      shutil.rmtree(manually_labeled_folder_merged)
+      shutil.rmtree(merged_folder)
+      shutil.rmtree(output_folder)
+      shutil.rmtree(os.path.join(HOME, 'runs'))
+      patterns = [os.path.join(HOME, "pseudo-labels-*"), os.path.join(HOME, "unlabeled_dataset_*")]
+      for pattern in patterns:
+        for folder in glob.glob(pattern):
+          if os.path.isdir(folder):
+            shutil.rmtree(folder)
+      clear_output()
       return final_predictions_list
 
     else:
@@ -480,34 +485,32 @@ def iterative_auto_labeling(main_dataset_dir, num_images_per_instance, num_insta
       os.makedirs(merged_folder, exist_ok=True)
 
       # merge the auto-annotated datasets
-      preprocess.merge_datasets(auto_annotated_datasets_folders, merged_folder)
+      merge_datasets(auto_annotated_datasets_folders, merged_folder)
       print("Auto-annotated dataset prepared.")
 
-      # define the final output folder
+      # Preparing the final auto annotated datasets
       Final_output_folder = "/content/Final_auto_annotated_dataset"
+      if os.path.exists(Final_output_folder):
+        shutil.rmtree(Final_output_folder)
       os.makedirs(Final_output_folder, exist_ok=True)
 
       # split the output folder
-      preprocess.resplit_dataset(merged_folder, Final_output_folder, train_ratio = 0.9, test_ratio = 0.0, val_ratio= 0.1, seed=42)
+      resplit_dataset(merged_folder, Final_output_folder, train_ratio = 0.9, test_ratio = 0.0, val_ratio= 0.1, seed=42)
       print("Dataset Ready")
 
       #remove all folders creates except Final output folder
       shutil.rmtree(distributed_datasets)
       shutil.rmtree(remaining_unlabeled_images)
-      shutil.rmtree(unlabeled_images_folder)
-      shutil.rmtree(auto_annotated_datasets_folders)
       shutil.rmtree(auto_annotated_folders)
-      shutil.rmtree(manually_labeled_folder)
       shutil.rmtree(manually_labeled_folder_merged)
       shutil.rmtree(merged_folder)
-      shutil.rmtree(os.path.join({HOME}, "final_labels"))
-      shutil.rmtree(os.path.join({HOME}, 'final_Pseudo_labels'))
-      shutil.rmtree(os.path.join({HOME}, 'runs'))
+      shutil.rmtree(output_folder)
+      shutil.rmtree(os.path.join(HOME, 'runs'))
       patterns = [os.path.join(HOME, "pseudo-labels-*"), os.path.join(HOME, "unlabeled_dataset_*")]
       for pattern in patterns:
         for folder in glob.glob(pattern):
           if os.path.isdir(folder):
             shutil.rmtree(folder)
-
+      clear_output()
       return final_predictions_list
 
