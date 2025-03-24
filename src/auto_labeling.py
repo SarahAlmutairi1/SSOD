@@ -10,7 +10,8 @@ import dataset
 import preprocess
 import train 
 import evaluate
-
+import glob
+from IPython.display import clear_output
 
 def read_predictions_from_file(file_path, image_width, image_height, ScoreBased, ScoreThreshold):
     """
@@ -193,12 +194,9 @@ def save_predictions(predictions, output_folder, image_width, image_height):
               bbox_str = ' '.join(map(str, bbox))
               f.write(f"{class_id} {bbox_str}\n")
 
-import glob
-from IPython.display import clear_output
 def iterative_auto_labeling(main_dataset_dir, num_images_per_instance, num_instances, epochs_per_iteration, img_size, class_names ,threshold_val= 0.5, ScoreBased = True, ScoreThreshold = 0.6):
     iteration = 0
     images_per_iteration = num_images_per_instance*num_instances
-    ground_truth_folder = '/content/datasets/VOC1/valid/labels'  # Folder containing ground truth labels
 
     # Prepare the datasets folder
     if not os.path.exists(main_dataset_dir):
@@ -330,11 +328,9 @@ def iterative_auto_labeling(main_dataset_dir, num_images_per_instance, num_insta
         final_predictions_list.append(final_predictions)
 
         # Save final predictions
-        output_folder = "/content/final_labels"
+        output_folder = f"{HOME}/final_labels"
         save_predictions(final_predictions, output_folder, image_width = img_size, image_height = img_size)
         num_images_per_instance = int(len(os.listdir(output_folder))/num_instances)
-        print(f'num_images_per_instance: {num_images_per_instance}')
-        print(f'number of final predictions is {len(os.listdir(output_folder))}')
         print("Final predictions saved.")
 
         # if the final predicted pseudo labels are less than needed no. of images_per_iteration, stop
@@ -402,7 +398,7 @@ def iterative_auto_labeling(main_dataset_dir, num_images_per_instance, num_insta
       print(f'number of final predictions is {len(final_predictions)}')
 
       # Save final predictions
-      output_folder = "/content/final_labels"
+      output_folder = f"{HOME}/final_labels"
       save_predictions(final_predictions, output_folder, image_width = img_size, image_height = img_size)
       print("Final predictions saved.")
 
@@ -433,14 +429,14 @@ def iterative_auto_labeling(main_dataset_dir, num_images_per_instance, num_insta
 
       #Prepare the auto-annotated dataset
       print("Preparing auto-annotated dataset...")
-      merged_folder = "/content/merged_folder"
+      merged_folder = f"{HOME}/merged_folder"
       os.makedirs(merged_folder, exist_ok=True)
 
       merge_datasets(auto_annotated_datasets_folders, merged_folder)
       print("Auto-annotated dataset prepared.")
 
       # Preparing the final auto annotated datasets
-      Final_output_folder = "/content/Final_auto_annotated_dataset"
+      Final_output_folder = f"{HOME}/Final_auto_annotated_dataset"
       if os.path.exists(Final_output_folder):
         shutil.rmtree(Final_output_folder)
       os.makedirs(Final_output_folder, exist_ok=True)
@@ -481,7 +477,7 @@ def iterative_auto_labeling(main_dataset_dir, num_images_per_instance, num_insta
 
       # Prepare the auto-annotated dataset
       print("Preparing auto-annotated dataset...")
-      merged_folder = "/content/merged_folder"
+      merged_folder = f"{HOME}/merged_folder"
       os.makedirs(merged_folder, exist_ok=True)
 
       # merge the auto-annotated datasets
@@ -489,7 +485,7 @@ def iterative_auto_labeling(main_dataset_dir, num_images_per_instance, num_insta
       print("Auto-annotated dataset prepared.")
 
       # Preparing the final auto annotated datasets
-      Final_output_folder = "/content/Final_auto_annotated_dataset"
+      Final_output_folder = f"{HOME}/Final_auto_annotated_dataset"
       if os.path.exists(Final_output_folder):
         shutil.rmtree(Final_output_folder)
       os.makedirs(Final_output_folder, exist_ok=True)
@@ -513,4 +509,6 @@ def iterative_auto_labeling(main_dataset_dir, num_images_per_instance, num_insta
             shutil.rmtree(folder)
       clear_output()
       return final_predictions_list
+
+
 
