@@ -28,9 +28,6 @@ The project is organized as follows:
     - `config.py` — Stores configuration settings such as paths and hyperparameters.
   - **`notebooks/`** — colab notebooks 
     - `Ensemble_Teacher_Student_Refinement.ipynb` — A notebook demonstrating the framework.
-  - **`data/`** — Directory for datasets.
-  - **`models/`** — Directory for trained model weights.
-  - **`results/`** — Stores logs, evaluation reports, and predictions.
   - `.gitignore`
   - `requirements.txt` — dependencies
 
