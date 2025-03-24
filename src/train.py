@@ -169,7 +169,6 @@ def Pseudo_Labeling(best_model_paths, unlabeled_dataset, iteration):
     return list_iteration_folder_path
 
 def train_final_model(dataset, img_size, train_epochs):
-  
   #Start Timer
   start_time = time.time()
 
@@ -185,7 +184,7 @@ def train_final_model(dataset, img_size, train_epochs):
 
   #End Timer
   end_time = time.time()
-  runtime = (end_time - start_time) / 60
-  print(f"Runtime: {runtime:.2f} minutes")
+  runtime = (end_time - start_time) / 3600
+  print(f"Runtime: {runtime:.2f} hr")
 
-  return best_model_path
+  return best_model_path, runtime
