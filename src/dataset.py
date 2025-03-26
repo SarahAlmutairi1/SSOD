@@ -7,6 +7,7 @@ from pathlib import Path
 from shutil import move
 import config
 import preprocess
+
 # Download
 dir = Path(f'/{HOME}/datasets/VOC')
 url = 'https://github.com/ultralytics/assets/releases/download/v0.0.0/'
