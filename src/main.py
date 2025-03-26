@@ -1,6 +1,6 @@
 import os
 import time
-import dataset
+import VOC-dataset
 import train
 import auto_labeling
 import evaluate
@@ -120,8 +120,9 @@ def main(main_dataset_dir, class_names, img_size, num_instances, epochs_per_iter
 
 # Main execution
 if __name__ == "__main__":
-    print(f"Home Directory: {HOME}")
-
+    
+    print(f"Downloading Pascal Voc Dataset")
+    
     # Call the main
     main_dataset_dir = f'{HOME}/datasets/VOC1'  # dataset path
     output_path = f'{HOME}/output'  # output folder path
