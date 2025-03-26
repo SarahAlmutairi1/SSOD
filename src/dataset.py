@@ -5,6 +5,7 @@ from ultralytics.utils.downloads import download
 import os
 from pathlib import Path
 from shutil import move
+import config
 
 def convert_label(path, lb_path, year, image_id):
     def convert_box(size, box):
@@ -35,7 +36,7 @@ def convert_label(path, lb_path, year, image_id):
 
 
 # Download
-dir = Path('/content/datasets/VOC')
+dir = Path(f'/{HOME}/datasets/VOC')
 url = 'https://github.com/ultralytics/assets/releases/download/v0.0.0/'
 urls = [f'{url}VOCtrainval_06-Nov-2007.zip',  # 446MB, 5012 images
         f'{url}VOCtest_06-Nov-2007.zip',  # 438MB, 4953 images
