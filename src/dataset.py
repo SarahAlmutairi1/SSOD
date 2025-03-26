@@ -5,7 +5,7 @@ from ultralytics.utils.downloads import download
 import os
 from pathlib import Path
 from shutil import move
-import config
+from config import HOME
 import preprocess
 
 def convert_label(path, lb_path, year, image_id):
