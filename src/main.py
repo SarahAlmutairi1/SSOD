@@ -5,7 +5,7 @@ import train
 import auto_labeling
 import evaluate
 import csv
-import config
+from config import HOME
 
 def log_results(num_instances, threshold_val, ScoreBased, ScoreThreshold, processing_time, Train_time, metrics, Labels_quality, save_path, filename="results.csv"):
     """
