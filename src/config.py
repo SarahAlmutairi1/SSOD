@@ -1,2 +1,3 @@
 import os
-HOME = '/SSOD'
+HOME = os.getcwd()
+HOME = HOME +'/SSOD'
