@@ -5,7 +5,7 @@ import numpy as np
 import torch
 import shutil
 from collections import Counter
-import config
+from config import HOME
 import dataset
 import preprocess
 import train 
