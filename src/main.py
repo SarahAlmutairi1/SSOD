@@ -5,6 +5,7 @@ import train
 import auto_labeling
 import evaluate
 import csv
+import config
 
 def log_results(num_instances, threshold_val, ScoreBased, ScoreThreshold, processing_time, Train_time, metrics, Labels_quality, save_path, filename="results.csv"):
     """
@@ -119,9 +120,6 @@ def main(main_dataset_dir, class_names, img_size, num_instances, epochs_per_iter
 
 # Main execution
 if __name__ == "__main__":
-
-    global HOME
-    HOME = os.getcwd()  # Get the current working directory
     print(f"Home Directory: {HOME}")
 
     # Call the main
