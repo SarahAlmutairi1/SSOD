@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 from ultralytics import YOLO
 from PIL import Image
-import main
+
 
 
 def evaluate_predictions(predictions_folder, ground_truth_folder, class_names):
