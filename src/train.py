@@ -8,7 +8,7 @@ from concurrent.futures import ProcessPoolExecutor, as_completed
 import traceback
 import torch
 import torch.multiprocessing as mp
-import config
+from config import HOME
 
 def train_single_instance(dataset_path, epochs_per_iteration, model, img_size):
     """Train a single YOLO instance and return the best model path and its performance."""
