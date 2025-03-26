@@ -63,10 +63,10 @@ def download_VOC():
     
     
     # Paths
-    base_dir = Path("datasets/VOC")
+    base_dir = Path(HOME) / "datasets" / "VOC"
     current_dir_img = base_dir / "images"
     current_dir_label = base_dir / "labels"
-    output_dir = Path('datasets/VOC1')
+    output_dir = Path(HOME) / "datasets" / "VOC1"
     
     # Create new structure
     for split in ["train", "valid", "test"]:
