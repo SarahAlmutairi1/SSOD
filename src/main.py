@@ -122,6 +122,7 @@ def main(main_dataset_dir, class_names, img_size, num_instances, epochs_per_iter
 if __name__ == "__main__":
     
     print(f"Downloading Pascal Voc Dataset")
+    download_VOC()
     
     # Call the main
     main_dataset_dir = f'{HOME}/datasets/VOC1'  # dataset path
