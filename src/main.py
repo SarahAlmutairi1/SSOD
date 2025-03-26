@@ -1,6 +1,6 @@
 import os
 import time
-import VOC_dataset
+import dataset
 import train
 import auto_labeling
 import evaluate
