@@ -6,7 +6,6 @@ import random
 from pathlib import Path
 from concurrent.futures import ProcessPoolExecutor, as_completed
 import traceback
-from main import HOME
 import torch
 import torch.multiprocessing as mp
 
