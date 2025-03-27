@@ -380,3 +380,22 @@ def merge_datasets(source_folders, output_folder):
                 shutil.move(label_path, target_label_path)
 
     print(f"All images and labels have been moved to {output_folder}.")
+def move_images(src_folder, dest_folder, num_images):
+    """
+    Move a specified number of images from the source folder to the destination folder.
+    """
+    # Ensure destination folder exists
+    os.makedirs(dest_folder, exist_ok=True)
+
+    # List all images in the source folder
+    images_folder = os.path.join(src_folder, 'images')
+    all_images = [f for f in os.listdir(images_folder) if os.path.isfile(os.path.join(images_folder, f))]
+
+    # Randomly sample the specified number of images
+    selected_images = random.sample(all_images, min(num_images, len(all_images)))
+
+    # Move selected images to the destination folder
+    for image in selected_images:
+        shutil.move(os.path.join(images_folder, image), os.path.join(dest_folder, image))
+
+    return dest_folder
