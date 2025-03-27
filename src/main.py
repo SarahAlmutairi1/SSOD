@@ -81,7 +81,7 @@ def main(main_dataset_dir, class_names, img_size, num_instances, epochs_per_iter
     # Execute the iterative auto-labeling process
     start_time = time.time()
 
-    final_predictions = auto_labeling.§iterative_auto_labeling(
+    final_predictions = auto_labeling.iterative_auto_labeling(
         main_dataset_dir, num_images_per_instance, num_instances,
         epochs_per_iteration, img_size,class_names, threshold_val=0.5,
         ScoreBased=True, ScoreThreshold=0.6)
