@@ -81,7 +81,7 @@ def main(main_dataset_dir, class_names, img_size, num_instances, epochs_per_iter
     # Execute the iterative auto-labeling process
     start_time = time.time()
 
-    final_predictions = iterative_auto_labeling(
+    final_predictions = auto_labeling.§iterative_auto_labeling(
         main_dataset_dir, num_images_per_instance, num_instances,
         epochs_per_iteration, img_size,class_names, threshold_val=0.5,
         ScoreBased=True, ScoreThreshold=0.6)
@@ -97,7 +97,7 @@ def main(main_dataset_dir, class_names, img_size, num_instances, epochs_per_iter
     Final_auto_annotated_dataset = f'{HOME}/Final_auto_annotated_dataset'
 
     # Train the YOLO model using the auto-annotated labels
-    model, Train_time = train_final_model(Final_auto_annotated_dataset, img_size, 200)
+    model, Train_time = train.train_final_model(Final_auto_annotated_dataset, img_size, 200)
 
     # Evaluate the model
     metrics = evaluate_final_model(f'{HOME}/{model}', main_dataset_dir, img_size)
@@ -112,7 +112,7 @@ def main(main_dataset_dir, class_names, img_size, num_instances, epochs_per_iter
     output_folder = "/content/final_pred"
     save_predictions(all_final_predictions, output_folder, img_size, img_size)
     ground_truth_folder = '/content/datasets/VOC1/valid/labels'  # Folder containing ground truth labels
-    Labels_quality = evaluate_predictions(output_folder, ground_truth_folder, class_names)
+    Labels_quality = evaluate.evaluate_predictions(output_folder, ground_truth_folder, class_names)
 
     # Log results
     log_results(num_instances, threshold_val, ScoreBased, ScoreThreshold, processing_time, Train_time,metrics, Labels_quality, save_path)
