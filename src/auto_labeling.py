@@ -285,7 +285,7 @@ def iterative_auto_labeling(main_dataset_dir, num_images_per_instance, num_insta
 
         # Train each YOLO model using the distributed datasets
         print("Training YOLO models...")
-        best_model_paths, model_performance = train.train_multiple_instances(distributed_datasets_folders, epochs_per_iteration, best_models)
+        best_model_paths, model_performance = train.train_multiple_instances(distributed_datasets_folders, epochs_per_iteration, best_models, img_size)
         print(f'best model paths: {best_model_paths}')
         print(f'Training iteration #{iteration}')
         print(f'model_performance: {model_performance}')
