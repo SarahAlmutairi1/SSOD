@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 from ultralytics import YOLO
 from PIL import Image
+from config import HOME
 
 
 
@@ -130,19 +131,19 @@ def save_evaluation_results(iteration, results_text, cm_plot):
     plt.close(cm_plot)
 
 def evaluate_final_model(model,dataset, img_size):
-  model = YOLO(model)
-  result = model.val(data=f'{dataset}/data.yaml', split='test')
+    model = YOLO(model)
+    dataset_path = f"{HOME}/datasets/VOC1"
+    result = model.val(data=f'{dataset_path}/data.yaml', split='test')
 
-  # Extract metrics
-  res = result.mean_results()
-  metrics = {
-      "precision": res[0],   # Mean precision over all classes
-      "recall": res[1],      # Mean recall over all classes
-      "mAP50": res[2],           # mAP at 0.5 IoU
-      "mAP50-95": res[3]          # mAP over range 0.5:0.95 IoU
-  }
-
-  return metrics
+    # Extract metrics
+    res = result.mean_results()
+    metrics = {
+          "precision": res[0],   # Mean precision over all classes
+          "recall": res[1],      # Mean recall over all classes
+          "mAP50": res[2],           # mAP at 0.5 IoU
+          "mAP50-95": res[3]          # mAP over range 0.5:0.95 IoU
+      }
+    return metrics
     
 def visualize_predictions(image_path, predictions, image_width, image_height):
     """
