@@ -100,7 +100,7 @@ def main(iteration ,main_dataset_dir, class_names, img_size, num_instances, epoc
     model, Train_time = train.train_final_model(iteration, Final_auto_annotated_dataset, img_size, 200)
 
     # Evaluate the model
-    metrics = evaluate_final_model(f'{HOME}/{model}', main_dataset_dir, img_size)
+    metrics = evaluate.evaluate_final_model(f'{HOME}/{model}', main_dataset_dir, img_size)
 
     # Combine all final Pseudo-predictions from each instance
     all_final_predictions = {}
@@ -110,7 +110,7 @@ def main(iteration ,main_dataset_dir, class_names, img_size, num_instances, epoc
     # Evaluate the predictions generated during the auto-labeling process
     print("Evaluating labels produced by the ETSR model")
     output_folder = "/content/final_pred"
-    save_predictions(all_final_predictions, output_folder, img_size, img_size)
+    auto_labeling.save_predictions(all_final_predictions, output_folder, img_size, img_size)
     ground_truth_folder = '/content/datasets/VOC1/valid/labels'  # Folder containing ground truth labels
     Labels_quality = evaluate.evaluate_predictions(output_folder, ground_truth_folder, class_names)
 
