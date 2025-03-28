@@ -54,7 +54,7 @@ def log_results(num_instances, threshold_val, ScoreBased, ScoreThreshold, proces
 
     print(f"Results logged in: {file_path}")
 
-def main(main_dataset_dir, class_names, img_size, num_instances, epochs_per_iteration, threshold_val, ScoreBased, ScoreThreshold, save_path):
+def main(iteration ,main_dataset_dir, class_names, img_size, num_instances, epochs_per_iteration, threshold_val, ScoreBased, ScoreThreshold, save_path):
     """
     Main function that drives the iterative auto-labeling process and model training
     with auto-annotated labels.
@@ -97,7 +97,7 @@ def main(main_dataset_dir, class_names, img_size, num_instances, epochs_per_iter
     Final_auto_annotated_dataset = f'{HOME}/Final_auto_annotated_dataset'
 
     # Train the YOLO model using the auto-annotated labels
-    model, Train_time = train.train_final_model(Final_auto_annotated_dataset, img_size, 200)
+    model, Train_time = train.train_final_model(iteration, Final_auto_annotated_dataset, img_size, 200)
 
     # Evaluate the model
     metrics = evaluate_final_model(f'{HOME}/{model}', main_dataset_dir, img_size)
@@ -138,14 +138,15 @@ if __name__ == "__main__":
     score_thresholds = [0.5, 0.6, 0.7, 0.8]
 
     # run the experiment
+    iteration = 0
     for num_instances in num_instances_list:
         for threshold_val in threshold_values:
             for ScoreBased in score_based_options:
                 if ScoreBased:
                   for ScoreThreshold in score_thresholds:
                       print(f"Running with: num_instances={num_instances}, threshold_val={threshold_val}, ScoreBased={ScoreBased}, ScoreThreshold={ScoreThreshold}")
-                      main( main_dataset_dir, class_names, img_size, num_instances,epochs_per_iteration, threshold_val, ScoreBased, ScoreThreshold, output_path)
+                      main(iteration+1, main_dataset_dir, class_names, img_size, num_instances,epochs_per_iteration, threshold_val, ScoreBased, ScoreThreshold, output_path)
                 else:
                   ScoreThreshold = 0    # neglected since scoreBased is False
                   print(f"Running with: num_instances={num_instances}, threshold_val={threshold_val}, ScoreBased={ScoreBased}, ScoreThreshold neglected")
-                  main( main_dataset_dir, class_names, img_size, num_instances,epochs_per_iteration, threshold_val, ScoreBased, ScoreThreshold, output_path)
+                  main( iteration+1, main_dataset_dir, class_names, img_size, num_instances,epochs_per_iteration, threshold_val, ScoreBased, ScoreThreshold, output_path)
