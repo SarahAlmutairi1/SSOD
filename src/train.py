@@ -26,7 +26,7 @@ def train_single_instance(dataset_path, epochs_per_iteration, model, img_size):
             PretrainedVal = False
 
         # Train the model
-        results = model.train(data=f'{dataset_path}/data.yaml', epochs=epochs_per_iteration, imgsz=img_size, plots=True, patience = 10, augment=True)#, pretrained= PretrainedVal)
+        results = model.train(data=f'{dataset_path}/data.yaml', epochs=epochs_per_iteration, imgsz=img_size, plots=True, patience = 10, augment=True, project=f'{HOME}/runs') #, pretrained= PretrainedVal)
         save_dir = results.save_dir  # Get the save directory
 
         print(f"Model saved to: {save_dir}")
@@ -168,14 +168,14 @@ def Pseudo_Labeling(best_model_paths, unlabeled_dataset, iteration):
     torch.cuda.empty_cache()  # Clear GPU memory after prediction
     return list_iteration_folder_path
 
-def train_final_model(dataset, img_size, train_epochs):
+def train_final_model(iteration ,dataset, img_size, train_epochs):
   #Start Timer
   start_time = time.time()
 
   #Train the model
   print("Training final model...")
   model = YOLO('yolo11n.pt')
-  results = model.train(data=f'{dataset}/data.yaml', epochs=train_epochs, imgsz=img_size, plots=True, augment=True, patience = 20)
+  results = model.train(data=f'{dataset}/data.yaml', epochs=train_epochs, imgsz=img_size, plots=True, augment=True, patience = 20, project=f'{HOME}/Final_runs', name=f'Final_model_runs_{iteration}')
   save_dir = results.save_dir  # Get the save directory
 
   # Path to the best model
