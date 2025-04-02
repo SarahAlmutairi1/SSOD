@@ -147,7 +147,7 @@ def evaluate_final_model(model,dataset, img_size):
         
     model = YOLO(model)
     dataset_path = f"{HOME}/datasets/VOC1"
-    result = model.val(data=f'{dataset_path}/data.yaml', split='test')
+    result = model.val(data=f'{dataset_path}/data.yaml', split='test', project=f'{HOME}/runs')
 
     # Extract metrics
     res = result.mean_results()
