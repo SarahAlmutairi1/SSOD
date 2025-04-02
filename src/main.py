@@ -7,7 +7,7 @@ import evaluate
 import csv
 from config import HOME
 from ultralytics import settings
-
+import subprocess
 def log_results(num_instances, threshold_val, ScoreBased, ScoreThreshold, processing_time, Train_time, metrics, Labels_quality, save_path, filename="results.csv"):
     """
     Logs experiment results into a CSV file at a specified path.
@@ -99,9 +99,14 @@ def main(iteration ,main_dataset_dir, class_names, img_size, num_instances, epoc
 
     # Train the YOLO model using the auto-annotated labels
     model, Train_time = train.train_final_model(iteration, Final_auto_annotated_dataset, img_size, 200)
+    
+    # Update Ultralytics settings
+    dataset_dir = f"{HOME}/datasets"
+    subprocess.run(f"yolo settings dataset_dir={dataset_dir}", shell=True, check=True)
+    # Verify that the setting is updated
+    subprocess.run("yolo settings", shell=True)
 
     # Evaluate the model
-    settings.update({"datasets_dir": f"{HOME}/datasets"})
     metrics = evaluate.evaluate_final_model(model, main_dataset_dir, img_size)
 
     # Combine all final Pseudo-predictions from each instance
