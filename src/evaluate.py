@@ -131,23 +131,8 @@ def save_evaluation_results(iteration, results_text, cm_plot):
     plt.close(cm_plot)
 
 def evaluate_final_model(model,dataset, img_size):
-    # Path to YOLO settings file
-    settings_path = "/root/.config/Ultralytics/settings.json"
-
-    # Load the existing settings
-    with open(settings_path, "r") as file:
-        settings = json.load(file)
-
-    # Update the dataset download directory
-    settings["dataset_download_dir"] = "/content/SSOD/datasets"
-
-    # Save the updated settings
-    with open(settings_path, "w") as file:
-        json.dump(settings, file, indent=4)
-        
     model = YOLO(model)
-    dataset_path = f"{HOME}/datasets/VOC1"
-    result = model.val(data=f'{dataset_path}/data.yaml', split='test', project=f'{HOME}/runs')
+    result = model.val(data=f'{dataset}/data.yaml', split='test', project=f'{HOME}/runs')
 
     # Extract metrics
     res = result.mean_results()
