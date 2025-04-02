@@ -9,7 +9,7 @@ import matplotlib.patches as patches
 from ultralytics import YOLO
 from PIL import Image
 from config import HOME
-import json
+import subprocess
 
 
 def evaluate_predictions(predictions_folder, ground_truth_folder, class_names):
@@ -131,6 +131,12 @@ def save_evaluation_results(iteration, results_text, cm_plot):
     plt.close(cm_plot)
 
 def evaluate_final_model(model,dataset, img_size):
+    # Update Ultralytics settings
+    dataset_dir = f"{HOME}/datasets"
+    subprocess.run(f"yolo settings dataset_dir={dataset_dir}", shell=True, check=True)
+    # Verify that the setting is updated
+    subprocess.run("yolo settings", shell=True)
+    
     model = YOLO(model)
     result = model.val(data=f'{dataset}/data.yaml', split='test', project=f'{HOME}/runs')
 
