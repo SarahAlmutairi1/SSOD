@@ -9,7 +9,7 @@ import matplotlib.patches as patches
 from ultralytics import YOLO
 from PIL import Image
 from config import HOME
-
+import json
 
 
 def evaluate_predictions(predictions_folder, ground_truth_folder, class_names):
@@ -131,6 +131,20 @@ def save_evaluation_results(iteration, results_text, cm_plot):
     plt.close(cm_plot)
 
 def evaluate_final_model(model,dataset, img_size):
+    # Path to YOLO settings file
+    settings_path = "/root/.config/Ultralytics/settings.json"
+
+    # Load the existing settings
+    with open(settings_path, "r") as file:
+        settings = json.load(file)
+
+    # Update the dataset download directory
+    settings["dataset_download_dir"] = "/content/SSOD/datasets"
+
+    # Save the updated settings
+    with open(settings_path, "w") as file:
+        json.dump(settings, file, indent=4)
+        
     model = YOLO(model)
     dataset_path = f"{HOME}/datasets/VOC1"
     result = model.val(data=f'{dataset_path}/data.yaml', split='test')
