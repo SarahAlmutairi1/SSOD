@@ -136,7 +136,7 @@ def Pseudo_Labeling(best_model_paths, unlabeled_dataset, iteration):
     for i, model_path in enumerate(best_model_paths):
         print(f"Model {i+1}:{model_path} predicting unlabeled images...")
         model = YOLO(model_path)
-        results = model.predict(unlabeled_dataset, save=False, save_txt=True, save_conf=True)
+        results = model.predict(unlabeled_dataset, project=f'{HOME}/runs',save=False, save_txt=True, save_conf=True)
         print(f"Predictions for model {i+1} saved.")
 
         # Define the path for labels source
