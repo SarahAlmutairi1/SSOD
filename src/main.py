@@ -98,7 +98,7 @@ def main(iteration ,main_dataset_dir, class_names, img_size, num_instances, epoc
     Final_auto_annotated_dataset = f'{HOME}/Final_auto_annotated_dataset'
 
     # Train the YOLO model using the auto-annotated labels
-    model, Train_time = train.train_final_model(iteration, Final_auto_annotated_dataset, img_size, 200)
+    model, Train_time = train.train_final_model(iteration, Final_auto_annotated_dataset, img_size, 1)
     
     # Update Ultralytics settings
     dataset_dir = f"{HOME}/datasets"
@@ -138,11 +138,11 @@ if __name__ == "__main__":
         "pottedplant", "sheep", "sofa", "train", "tvmonitor"]
 
     img_size = 640
-    epochs_per_iteration = 50
-    num_instances_list = [2, 3, 5, 7, 9]
-    threshold_values = [0.5, 0.6, 0.7, 0.8]
+    epochs_per_iteration = 1
+    num_instances_list = [2]
+    threshold_values = [0.5]
     score_based_options = [False, True]
-    score_thresholds = [0.5, 0.6, 0.7, 0.8]
+    score_thresholds = [0.5]
 
     # run the experiment
     iteration = 0
