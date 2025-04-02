@@ -6,6 +6,7 @@ import auto_labeling
 import evaluate
 import csv
 from config import HOME
+from ultralytics import settings
 
 def log_results(num_instances, threshold_val, ScoreBased, ScoreThreshold, processing_time, Train_time, metrics, Labels_quality, save_path, filename="results.csv"):
     """
@@ -100,6 +101,7 @@ def main(iteration ,main_dataset_dir, class_names, img_size, num_instances, epoc
     model, Train_time = train.train_final_model(iteration, Final_auto_annotated_dataset, img_size, 200)
 
     # Evaluate the model
+    settings.update({"datasets_dir": f"{HOME}/datasets"})
     metrics = evaluate.evaluate_final_model(model, main_dataset_dir, img_size)
 
     # Combine all final Pseudo-predictions from each instance
