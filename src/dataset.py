@@ -38,7 +38,7 @@ def convert_label(path, lb_path, year, image_id):
 
 def download_VOC():
     # Download path
-    dir = Path(HOME) / "datasets" / "VOC"
+    dir = Path(HOME)/ "src" / "datasets" / "VOC"
     url = 'https://github.com/ultralytics/assets/releases/download/v0.0.0/'
     urls = [f'{url}VOCtrainval_06-Nov-2007.zip',  # 446MB, 5012 images
             f'{url}VOCtest_06-Nov-2007.zip',  # 438MB, 4953 images
@@ -63,10 +63,10 @@ def download_VOC():
     
     
     # Paths
-    base_dir = Path(HOME) / "datasets" / "VOC"
+    base_dir = Path(HOME)/ "src" / "datasets" / "VOC"
     current_dir_img = base_dir / "images"
     current_dir_label = base_dir / "labels"
-    output_dir = Path(HOME) / "datasets" / "VOC1"
+    output_dir = Path(HOME)/ "src" / "datasets" / "VOC1"
     
     # Create new structure
     for split in ["train", "valid", "test"]:
