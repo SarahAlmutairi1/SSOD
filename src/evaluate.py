@@ -130,15 +130,9 @@ def save_evaluation_results(iteration, results_text, cm_plot):
     cm_plot.savefig(os.path.join(eval_dir, "confusion_matrix.png"))
     plt.close(cm_plot)
 
-def evaluate_final_model(model,dataset, img_size):
-    # Update Ultralytics settings
-    dataset_dir = f"{HOME}/datasets"
-    subprocess.run(f"yolo settings dataset_dir={dataset_dir}", shell=True, check=True)
-    # Verify that the setting is updated
-    subprocess.run("yolo settings", shell=True)
-    
+def evaluate_final_model(model,dataset, img_size):    
     model = YOLO(model)
-    result = model.val(data=f'{dataset}/data.yaml', split='test', project=f'{HOME}/runs')
+    result = model.val(data=f'{HOME}/datasets/VOC1/data.yaml', split='test', project=f'{HOME}/runs')
 
     # Extract metrics
     res = result.mean_results()
