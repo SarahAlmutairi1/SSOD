@@ -2,7 +2,7 @@ import os
 import csv
 import numpy as np
 import pybboxes as pyb
-from sklearn.metrics import confusion_matrix, classification_report, accuracy_score, precision_score, recall_score, average_precision_score
+from sklearn.metrics import confusion_matrix, classification_report, accuracy_score, precision_score, recall_score, average_precision_score, f1_score
 import seaborn as sns
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
