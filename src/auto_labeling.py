@@ -183,6 +183,7 @@ def save_predictions(predictions, output_folder, image_width, image_height):
     output_folder: Folder to save the prediction files.
     """
     if not os.path.exists(output_folder):
+        print("Output folder Created")
         os.makedirs(output_folder)
 
     for image_file, model_predictions in predictions.items():
