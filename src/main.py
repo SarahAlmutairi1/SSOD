@@ -112,7 +112,7 @@ def main(iteration ,main_dataset_dir, class_names, img_size, num_instances, epoc
     print("Evaluating labels produced by the ETSR model")
     output_folder = "/content/final_pred"
     auto_labeling.save_predictions(all_final_predictions, output_folder, img_size, img_size)
-    ground_truth_folder = '{HOME}/src/datasets/VOC1/valid/labels'  # Folder containing ground truth labels
+    ground_truth_folder = f'{main_dataset_dir}/valid/labels'  # Folder containing ground truth labels
     Labels_quality = evaluate.evaluate_predictions(output_folder, ground_truth_folder, class_names)
 
     # Log results
