@@ -76,7 +76,7 @@ def main(iteration ,main_dataset_dir, class_names, img_size, num_instances, epoc
     """
 
     # Define the number of images each YOLO instance should be trained on per iteration
-    num_images_per_instance = int(len(os.listdir(main_dataset_dir + 'src/train/images')) / num_instances)
+    num_images_per_instance = int(len(os.listdir(main_dataset_dir + '/train/images')) / num_instances)
     print(f'Number of images per instance: {num_images_per_instance}')
 
     # Execute the iterative auto-labeling process
