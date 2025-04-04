@@ -76,7 +76,7 @@ def main(iteration ,main_dataset_dir, class_names, img_size, num_instances, epoc
     """
 
     # Define the number of images each YOLO instance should be trained on per iteration
-    num_images_per_instance = int(len(os.listdir(main_dataset_dir + '/train/images')) / num_instances)
+    num_images_per_instance = int(len(os.listdir(main_dataset_dir + 'src/train/images')) / num_instances)
     print(f'Number of images per instance: {num_images_per_instance}')
 
     # Execute the iterative auto-labeling process
@@ -112,7 +112,7 @@ def main(iteration ,main_dataset_dir, class_names, img_size, num_instances, epoc
     print("Evaluating labels produced by the ETSR model")
     output_folder = "/content/final_pred"
     auto_labeling.save_predictions(all_final_predictions, output_folder, img_size, img_size)
-    ground_truth_folder = '/content/datasets/VOC1/valid/labels'  # Folder containing ground truth labels
+    ground_truth_folder = '{HOME}/src/datasets/VOC1/valid/labels'  # Folder containing ground truth labels
     Labels_quality = evaluate.evaluate_predictions(output_folder, ground_truth_folder, class_names)
 
     # Log results
@@ -123,7 +123,7 @@ def main(iteration ,main_dataset_dir, class_names, img_size, num_instances, epoc
 if __name__ == "__main__":
     
     # Call the main
-    main_dataset_dir = f'{HOME}/datasets/VOC1'  # dataset path
+    main_dataset_dir = f'{HOME}/src/datasets/VOC1'  # dataset path
     output_path = f'{HOME}/output'  # output folder path
 
     class_names =[
