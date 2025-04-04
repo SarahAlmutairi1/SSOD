@@ -86,6 +86,18 @@ def main(iteration ,main_dataset_dir, class_names, img_size, num_instances, epoc
         main_dataset_dir, num_images_per_instance, num_instances,
         epochs_per_iteration, img_size,class_names, threshold_val=0.5,
         ScoreBased=True, ScoreThreshold=0.6)
+    
+    # Combine all final Pseudo-predictions from each instance
+    all_final_predictions = {}
+    for d in final_predictions:
+        all_final_predictions.update(d)
+
+    # Evaluate the predictions generated during the auto-labeling process
+    print("Evaluating labels produced by the ETSR model")
+    output_folder = f"{HOME}/final_pred"
+    auto_labeling.save_predictions(all_final_predictions, output_folder, img_size, img_size)
+    ground_truth_folder = f'{main_dataset_dir}/valid/labels'  # Folder containing ground truth labels
+    Labels_quality = evaluate.evaluate_predictions(output_folder, ground_truth_folder, class_names)
 
     end_time = time.time()
     print("Auto-labeling process completed.")
@@ -102,18 +114,6 @@ def main(iteration ,main_dataset_dir, class_names, img_size, num_instances, epoc
 
     # Evaluate the model
     metrics = evaluate.evaluate_final_model(model, main_dataset_dir, img_size)
-
-    # Combine all final Pseudo-predictions from each instance
-    all_final_predictions = {}
-    for d in final_predictions:
-        all_final_predictions.update(d)
-
-    # Evaluate the predictions generated during the auto-labeling process
-    print("Evaluating labels produced by the ETSR model")
-    output_folder = f"{HOME}/final_pred"
-    auto_labeling.save_predictions(all_final_predictions, output_folder, img_size, img_size)
-    ground_truth_folder = f'{main_dataset_dir}/valid/labels'  # Folder containing ground truth labels
-    Labels_quality = evaluate.evaluate_predictions(output_folder, ground_truth_folder, class_names)
 
     # Log results
     log_results(num_instances, threshold_val, ScoreBased, ScoreThreshold, processing_time, Train_time,metrics, Labels_quality, save_path)
