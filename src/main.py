@@ -135,7 +135,7 @@ if __name__ == "__main__":
     epochs_per_iteration = 50
     num_instances_list = [3,5,7,9]
     threshold_values = [0.4,0.6,0.8]
-    score_based_options = [False, True]
+    score_based_options = [True]
     score_thresholds = [0.4,0.6,0.8]
 
     # run the experiment
