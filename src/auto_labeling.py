@@ -165,7 +165,7 @@ def process_predictions(models_folders, image_width, image_height, iou_threshold
     Returns a dictionary where keys are image names and values are the final aggregated predictions.
     """
     final_predictions = {}
-
+    print("Process_predictions entered")
     # Read and aggregate predictions for each image
     all_predictions = read_all_predictions(models_folders, image_width, image_height, ScoreBased, ScoreThreshold)
 
