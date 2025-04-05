@@ -96,9 +96,7 @@ def main(iteration ,main_dataset_dir, class_names, img_size, num_instances, epoc
     # Evaluate the predictions generated during the auto-labeling process
     print("Evaluating labels produced by the ETSR model")
     output_folder = f"{HOME}/TrainDataPredictions"
-
     print(f"Predictions in all_final_predictions: {len(all_final_predictions)}")
-    print(f"Files in output_folder before saving: {len(os.listdir(f'{output_folder}'))}")
 
     auto_labeling.save_predictions(all_final_predictions, output_folder, img_size, img_size)
     print(f"Files in output_folder after saving: {len(os.listdir(f'{output_folder}'))}")
