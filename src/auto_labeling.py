@@ -328,8 +328,8 @@ def iterative_auto_labeling(main_dataset_dir, num_images_per_instance, num_insta
 
         # Auto-annotate the next set of unlabeled images
         Pseudo_labels_folders = train.Pseudo_Labeling(best_model_paths, unlabeled_dataset, iteration)
-        print(f"len of Pseudo_labels_folders 0 = {len(os.listdir('/content/SSOD/pseudo-labels-1/labels-model-0'))}")
-        print(f"len of Pseudo_labels_folders 0 = {len(os.listdir('/content/SSOD/pseudo-labels-1/labels-model-1'))}")
+        print(f"len of Pseudo_labels_folders 0 = {len(os.listdir('/content/SSOD/pseudo-labels-0/labels-model-0'))}")
+        print(f"len of Pseudo_labels_folders 0 = {len(os.listdir('/content/SSOD/pseudo-labels-0/labels-model-1'))}")
         
         # Process the predictions from the Pseudo Labeling
         print("Processing final predictions...")
@@ -398,6 +398,8 @@ def iterative_auto_labeling(main_dataset_dir, num_images_per_instance, num_insta
 
       # Auto-annotate the next set of unlabeled images
       Pseudo_labels_folders = train.Pseudo_Labeling(best_model_paths, unlabeled_images_folder, iteration)
+      print(f"len of Pseudo_labels_folders 1 = {len(os.listdir('/content/SSOD/pseudo-labels-1/labels-model-0'))}")
+      print(f"len of Pseudo_labels_folders 1 = {len(os.listdir('/content/SSOD/pseudo-labels-1/labels-model-1'))}")
 
       # Process the predictions from the Pseudo Labeling
       print("Processing predictions...")
