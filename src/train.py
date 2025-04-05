@@ -139,8 +139,8 @@ def Pseudo_Labeling(best_model_paths, unlabeled_dataset, iteration):
         results = model.predict(unlabeled_dataset, project=f'{HOME}/runs',save=False, save_txt=True, save_conf=True)
         print(f"Predictions for model {i+1} saved.")
 
-        save_dir = results[0].save_dir  
-        labels_source = save_dir / 'labels'
+        save_dir = Path(results[0].save_dir)
+        labels_path = save_dir / 'labels'
         print(f"Labels saved to: {labels_source}")
         
         # Define the path for labels destination
