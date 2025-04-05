@@ -182,8 +182,10 @@ def save_predictions(predictions, output_folder, image_width, image_height):
     predictions: Dictionary of predictions where keys are image names and values are lists of predictions.
     output_folder: Folder to save the prediction files.
     """
-    if not os.path.exists(output_folder):
-        print("Output folder Created")
+    if os.path.exists(output_folder):
+        shutil.rmtree(output_folder)
+        os.makedirs(output_folder)
+    else:
         os.makedirs(output_folder)
 
     for image_file, model_predictions in predictions.items():
