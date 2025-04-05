@@ -103,6 +103,7 @@ def main(iteration ,main_dataset_dir, class_names, img_size, num_instances, epoc
     print(f"Files in output_folder after saving: {len(os.listdir(f'{output_folder}'))}")
 
     ground_truth_folder = f'{main_dataset_dir}/valid/labels'  # Folder containing ground truth label
+    print(f"Files in ground_truth_folder: {len(os.listdir(f'{ground_truth_folder}'))}")
 
     Labels_quality = evaluate.evaluate_predictions(output_folder, ground_truth_folder, class_names)
 
