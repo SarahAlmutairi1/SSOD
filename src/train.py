@@ -155,9 +155,8 @@ def Pseudo_Labeling(best_model_paths, unlabeled_dataset, iteration):
                     shutil.move(str(item), str(labels_path))
 
         # Delete all files created during current iteration
-        predictions = Path(f'{HOME}/runs/detect/predict')
-        if predictions.exists():
-          shutil.rmtree(f'{HOME}/runs/detect/predict')
+        if labels_source.exists():
+          shutil.rmtree(labels_source)
 
         model_id += 1
 
