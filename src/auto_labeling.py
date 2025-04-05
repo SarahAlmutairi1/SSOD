@@ -195,7 +195,7 @@ def save_predictions(predictions, output_folder, image_width, image_height):
               bbox_str = ' '.join(map(str, bbox))
               f.write(f"{class_id} {bbox_str}\n")
 
-def iterative_auto_labeling(main_dataset_dir, num_images_per_instance, num_instances, epochs_per_iteration, img_size, class_names ,threshold_val= 0.5, ScoreBased = True, ScoreThreshold = 0.6):
+def iterative_auto_labeling(main_dataset_dir, num_images_per_instance, num_instances, epochs_per_iteration, img_size, class_names ,threshold_val, ScoreBased, ScoreThreshold):
     iteration = 0
     images_per_iteration = num_images_per_instance*num_instances
 
@@ -323,8 +323,7 @@ def iterative_auto_labeling(main_dataset_dir, num_images_per_instance, num_insta
 
         # Process the predictions from the Pseudo Labeling
         print("Processing final predictions...")
-        final_predictions = process_predictions(Pseudo_labels_folders, image_width = img_size, image_height = img_size, iou_threshold = threshold_val, ScoreBased = False, ScoreThreshold = 0.6 )
-
+        final_predictions = process_predictions(Pseudo_labels_folders, image_width = img_size, image_height = img_size, iou_threshold = threshold_val, ScoreBased = ScoreBased, ScoreThreshold = ScoreThreshold )
         final_predictions_list.append(final_predictions)
 
         # Save final predictions
