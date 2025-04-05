@@ -132,6 +132,7 @@ def save_evaluation_results(iteration, results_text, cm_plot):
 
 def evaluate_final_model(model,dataset, img_size):    
     model = YOLO(model)
+    print("Evaluating model : {model}")
     result = model.val(data=f'{dataset}/data.yaml', split='test', project=f'{HOME}/runs')
 
     # Extract metrics
