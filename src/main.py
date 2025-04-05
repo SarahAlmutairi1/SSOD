@@ -94,12 +94,16 @@ def main(iteration ,main_dataset_dir, class_names, img_size, num_instances, epoc
 
     # Evaluate the predictions generated during the auto-labeling process
     print("Evaluating labels produced by the ETSR model")
-    output_folder = f"{HOME}/final_pred"
-    print(f"len of final pred = {len(all_final_predictions)}")
+    output_folder = f"{HOME}/TrainDataPredictions"
+
+    print(f"Predictions in all_final_predictions: {len(all_final_predictions)}")
+    print(f"Files in output_folder before saving: {len(os.listdir(f'{output_folder}'))}")
+
     auto_labeling.save_predictions(all_final_predictions, output_folder, img_size, img_size)
-    print(f"len of saved prediction in output folder = {len(output_folder)}")
+    print(f"Files in output_folder after saving: {len(os.listdir(f'{output_folder}'))}")
+
     ground_truth_folder = f'{main_dataset_dir}/valid/labels'  # Folder containing ground truth label
-    print(f" ground_truth_folder = {len(ground_truth_folder)}")
+
     Labels_quality = evaluate.evaluate_predictions(output_folder, ground_truth_folder, class_names)
 
     end_time = time.time()
