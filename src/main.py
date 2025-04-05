@@ -86,6 +86,7 @@ def main(iteration ,main_dataset_dir, class_names, img_size, num_instances, epoc
         main_dataset_dir, num_images_per_instance, num_instances,
         epochs_per_iteration, img_size,class_names, threshold_val=0.5,
         ScoreBased=True, ScoreThreshold=0.6)
+
     
     # Combine all final Pseudo-predictions from each instance
     all_final_predictions = {}
@@ -117,7 +118,7 @@ def main(iteration ,main_dataset_dir, class_names, img_size, num_instances, epoc
     Final_auto_annotated_dataset = f'{HOME}/Final_auto_annotated_dataset'
 
     # Train the YOLO model using the auto-annotated labels
-    model, Train_time = train.train_final_model(iteration, Final_auto_annotated_dataset, img_size, 1)
+    model, Train_time = train.train_final_model(iteration, Final_auto_annotated_dataset, img_size, 200)
 
     # Evaluate the model
     metrics = evaluate.evaluate_final_model(model, main_dataset_dir, img_size)
@@ -139,11 +140,11 @@ if __name__ == "__main__":
         "pottedplant", "sheep", "sofa", "train", "tvmonitor"]
 
     img_size = 640
-    epochs_per_iteration = 1
-    num_instances_list = [3]
-    threshold_values = [0.4]
-    score_based_options = [True]
-    score_thresholds = [0.4]
+    epochs_per_iteration = 50
+    num_instances_list = [3,5,7,9]
+    threshold_values = [0.4,0.6,0.8]
+    score_based_options = [False,True]
+    score_thresholds = [0.4,0.6,0.8]
 
     # run the experiment
     iteration = 0
