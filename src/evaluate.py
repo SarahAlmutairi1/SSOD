@@ -132,9 +132,9 @@ def save_evaluation_results(iteration, results_text, cm_plot):
     cm_plot.savefig(os.path.join(eval_dir, "confusion_matrix.png"))
     plt.close(cm_plot)
 
-def evaluate_final_model(model,dataset, img_size):    
-    model = YOLO(model)
+def evaluate_final_model(model,dataset, img_size):
     print("Evaluating model : {model}")
+    model = YOLO(model)
     result = model.val(data=f'{dataset}/data.yaml', split='test', project=f'{HOME}/runs')
 
     # Extract metrics
