@@ -170,6 +170,7 @@ def process_predictions(models_folders, image_width, image_height, iou_threshold
     all_predictions = read_all_predictions(models_folders, image_width, image_height, ScoreBased, ScoreThreshold)
 
     for image_file, predictions_list in all_predictions.items():
+        print(f"PROCESSING IMAGE: {image_file}")
         # Apply NMS to filter out redundant boxes
         aggregated_predictions = non_max_suppression_with_majority(predictions_list, iou_threshold)
         final_predictions[image_file] = aggregated_predictions
@@ -391,7 +392,7 @@ def iterative_auto_labeling(main_dataset_dir, num_images_per_instance, num_insta
 
       # Process the predictions from the Pseudo Labeling
       print("Processing predictions...")
-      final_predictions = process_predictions(Pseudo_labels_folders, image_width = img_size, image_height = img_size, iou_threshold = threshold_val, ScoreBased = False, ScoreThreshold = 0.6 )
+      final_predictions = process_predictions(Pseudo_labels_folders, image_width = img_size, image_height = img_size, iou_threshold = threshold_val, ScoreBased = ScoreBased, ScoreThreshold = ScoreThreshold )
 
       final_predictions_list.append(final_predictions)
       print(f'number of final predictions is {len(final_predictions)}')
