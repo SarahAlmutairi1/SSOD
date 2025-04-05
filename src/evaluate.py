@@ -16,8 +16,10 @@ def evaluate_predictions(predictions_folder, ground_truth_folder, class_names):
     """
     Evaluate predictions by generating a confusion matrix, classification report, accuracy, and mAP.
     """
+    print(f"Evaluating final predictions located in {predictions_folder}")
+    
     y_true, y_pred = [], []
-
+    
     # Loop through ground truth label files
     for label_file in os.listdir(ground_truth_folder):
         if not label_file.endswith('.txt'):
