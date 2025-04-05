@@ -56,7 +56,9 @@ def read_all_predictions(models_folders, image_width, image_height, ScoreBased, 
     print("read_all_predictions ENTERED")
     all_predictions = {}
     try:
+        print("TRY !!")
         image_files = os.listdir(models_folders[0])
+        print("len of image_files = {image_files}")
     except FileNotFoundError:
         print(f"Error: Directory not found - {models_folders[0]}")
         return all_predictions
@@ -326,7 +328,9 @@ def iterative_auto_labeling(main_dataset_dir, num_images_per_instance, num_insta
 
         # Auto-annotate the next set of unlabeled images
         Pseudo_labels_folders = train.Pseudo_Labeling(best_model_paths, unlabeled_dataset, iteration)
-
+        print(f"len of Pseudo_labels_folders 0 = {len(os.listdir('/content/SSOD/pseudo-labels-1/labels-model-0'))}")
+        print(f"len of Pseudo_labels_folders 0 = {len(os.listdir('/content/SSOD/pseudo-labels-1/labels-model-1'))}")
+        
         # Process the predictions from the Pseudo Labeling
         print("Processing final predictions...")
         final_predictions = process_predictions(Pseudo_labels_folders, image_width = img_size, image_height = img_size, iou_threshold = threshold_val, ScoreBased = ScoreBased, ScoreThreshold = ScoreThreshold )
