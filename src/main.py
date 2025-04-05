@@ -95,8 +95,11 @@ def main(iteration ,main_dataset_dir, class_names, img_size, num_instances, epoc
     # Evaluate the predictions generated during the auto-labeling process
     print("Evaluating labels produced by the ETSR model")
     output_folder = f"{HOME}/final_pred"
+    print(f"len of final pred = {len(all_final_predictions)}")
     auto_labeling.save_predictions(all_final_predictions, output_folder, img_size, img_size)
-    ground_truth_folder = f'{main_dataset_dir}/valid/labels'  # Folder containing ground truth labels
+    print(f"len of saved prediction in output folder = {len(output_folder)}")
+    ground_truth_folder = f'{main_dataset_dir}/valid/labels'  # Folder containing ground truth label
+    print(f" ground_truth_folder = {len(ground_truth_folder)}")
     Labels_quality = evaluate.evaluate_predictions(output_folder, ground_truth_folder, class_names)
 
     end_time = time.time()
@@ -145,9 +148,11 @@ if __name__ == "__main__":
             for ScoreBased in score_based_options:
                 if ScoreBased:
                   for ScoreThreshold in score_thresholds:
+                      iteration += 1 
                       print(f"Running with: num_instances={num_instances}, threshold_val={threshold_val}, ScoreBased={ScoreBased}, ScoreThreshold={ScoreThreshold}")
-                      main(iteration+1, main_dataset_dir, class_names, img_size, num_instances,epochs_per_iteration, threshold_val, ScoreBased, ScoreThreshold, output_path)
+                      main(iteration, main_dataset_dir, class_names, img_size, num_instances,epochs_per_iteration, threshold_val, ScoreBased, ScoreThreshold, output_path)
                 else:
                   ScoreThreshold = 0    # neglected since scoreBased is False
+                  iteration += 1 
                   print(f"Running with: num_instances={num_instances}, threshold_val={threshold_val}, ScoreBased={ScoreBased}, ScoreThreshold neglected")
-                  main( iteration+1, main_dataset_dir, class_names, img_size, num_instances,epochs_per_iteration, threshold_val, ScoreBased, ScoreThreshold, output_path)
+                  main( iteration, main_dataset_dir, class_names, img_size, num_instances,epochs_per_iteration, threshold_val, ScoreBased, ScoreThreshold, output_path)
