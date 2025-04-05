@@ -19,6 +19,7 @@ def read_predictions_from_file(file_path, image_width, image_height, ScoreBased,
     Read predictions from a text file in YOLO format and return as a list of tuples.
     Each tuple contains (class_id, [xmin, ymin, xmax, ymax], confidence score).
     """
+    print("read_predictions_from_file ENTERED")
     predictions = []
     try:
         with open(file_path, 'r') as f:
@@ -52,6 +53,7 @@ def read_all_predictions(models_folders, image_width, image_height, ScoreBased, 
     image_height: Height of the images
     Returns a dictionary where keys are image names and values are lists of predictions from each model.
     """
+    print("read_all_predictions ENTERED")
     all_predictions = {}
     try:
         image_files = os.listdir(models_folders[0])
@@ -63,6 +65,7 @@ def read_all_predictions(models_folders, image_width, image_height, ScoreBased, 
         return all_predictions
 
     for image_file in image_files:
+        print(" for loop in read_all_predictions ENTERED")
         if image_file.endswith(".txt"):  # Check if the file is a text file
             image_predictions = []
             for model_folder in models_folders:
@@ -73,6 +76,7 @@ def read_all_predictions(models_folders, image_width, image_height, ScoreBased, 
                 else:
                     print(f"No detection file found, skipping: {file_path}")
             if image_predictions:  # Only add if there are any predictions
+                print("predictions added !")
                 all_predictions[image_file] = image_predictions
 
     return all_predictions
@@ -168,7 +172,8 @@ def process_predictions(models_folders, image_width, image_height, iou_threshold
     print("Process_predictions entered")
     # Read and aggregate predictions for each image
     all_predictions = read_all_predictions(models_folders, image_width, image_height, ScoreBased, ScoreThreshold)
-
+    print(f"len of all_predictions = {len(all_predictions)} ")
+    
     for image_file, predictions_list in all_predictions.items():
         print(f"PROCESSING IMAGE: {image_file}")
         # Apply NMS to filter out redundant boxes
