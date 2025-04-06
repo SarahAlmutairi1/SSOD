@@ -19,7 +19,6 @@ def read_predictions_from_file(file_path, image_width, image_height, ScoreBased,
     Read predictions from a text file in YOLO format and return as a list of tuples.
     Each tuple contains (class_id, [xmin, ymin, xmax, ymax], confidence score).
     """
-    print("read_predictions_from_file ENTERED")
     predictions = []
     try:
         with open(file_path, 'r') as f:
@@ -53,12 +52,9 @@ def read_all_predictions(models_folders, image_width, image_height, ScoreBased, 
     image_height: Height of the images
     Returns a dictionary where keys are image names and values are lists of predictions from each model.
     """
-    print("read_all_predictions ENTERED")
     all_predictions = {}
     try:
-        print("TRY !!")
         image_files = os.listdir(models_folders[0])
-        print("len of image_files = {image_files}")
     except FileNotFoundError:
         print(f"Error: Directory not found - {models_folders[0]}")
         return all_predictions
@@ -67,7 +63,6 @@ def read_all_predictions(models_folders, image_width, image_height, ScoreBased, 
         return all_predictions
 
     for image_file in image_files:
-        print(" for loop in read_all_predictions ENTERED")
         if image_file.endswith(".txt"):  # Check if the file is a text file
             image_predictions = []
             for model_folder in models_folders:
@@ -171,13 +166,10 @@ def process_predictions(models_folders, image_width, image_height, iou_threshold
     Returns a dictionary where keys are image names and values are the final aggregated predictions.
     """
     final_predictions = {}
-    print("Process_predictions entered")
     # Read and aggregate predictions for each image
     all_predictions = read_all_predictions(models_folders, image_width, image_height, ScoreBased, ScoreThreshold)
-    print(f"len of all_predictions = {len(all_predictions)} ")
     
     for image_file, predictions_list in all_predictions.items():
-        print(f"PROCESSING IMAGE: {image_file}")
         # Apply NMS to filter out redundant boxes
         aggregated_predictions = non_max_suppression_with_majority(predictions_list, iou_threshold)
         final_predictions[image_file] = aggregated_predictions
@@ -325,14 +317,10 @@ def iterative_auto_labeling(main_dataset_dir, num_images_per_instance, num_insta
         del iteration_folder_name
         del iteration_folder_path
 
-
         # Auto-annotate the next set of unlabeled images
         Pseudo_labels_folders = train.Pseudo_Labeling(best_model_paths, unlabeled_dataset, iteration)
-        print(f"len of Pseudo_labels_folders 0 = {len(os.listdir('/content/SSOD/pseudo-labels-0/labels-model-0'))}")
-        print(f"len of Pseudo_labels_folders 0 = {len(os.listdir('/content/SSOD/pseudo-labels-0/labels-model-1'))}")
         
         # Process the predictions from the Pseudo Labeling
-        print("Processing final predictions...")
         final_predictions = process_predictions(Pseudo_labels_folders, image_width = img_size, image_height = img_size, iou_threshold = threshold_val, ScoreBased = ScoreBased, ScoreThreshold = ScoreThreshold )
         final_predictions_list.append(final_predictions)
 
@@ -353,18 +341,15 @@ def iterative_auto_labeling(main_dataset_dir, num_images_per_instance, num_insta
         iteration_auto_annotated_folder_path = os.path.join(HOME, auto_annotated_folders ,iteration_auto_annotated_folder_name)
 
         #update the unlabeled data
-        print("Updating unlabeled data ...")
-        print(f'before updating unlabeled images folder, {len(os.listdir(unlabeled_dataset))}')
-        print(f'before output folder has {len(os.listdir(output_folder))} labels')
+        print("Updating unlabeled data")
         Auto_annotated_folder = preprocess.update_unlabeled_folder(unlabeled_dataset, unlabeled_images_folder, output_folder, iteration_auto_annotated_folder_path)
         num_remaining_unlabeled_images = sum(os.path.isfile(os.path.join(unlabeled_images_folder, f)) for f in os.listdir(unlabeled_images_folder))
-        print(f'after updating unlabeled images folder, {len(os.listdir(unlabeled_dataset))}')
 
         del unlabeled_dataset
         images_folder = os.path.join(Auto_annotated_folder, 'images')
         num_auto_annotated_labels = sum(os.path.isfile(os.path.join(Auto_annotated_folder, f)) for f in os.listdir(Auto_annotated_folder))
 
-        print('enough auto-annotated labels : Prepare data for training ..')
+        print('enough auto-annotated labels : Prepare data for training')
         #delete the distributed dataset folder and create new one
         print("Deleting distributed dataset folder...")
         shutil.rmtree(distributed_datasets)
@@ -374,7 +359,7 @@ def iterative_auto_labeling(main_dataset_dir, num_images_per_instance, num_insta
           os.makedirs(dest_root_folder)
 
         #update the distributed folder using the auto-annotated data
-        print("Creating distributed folder...")
+        print("Creating distributed folder")
         print(f'num_images_per_instance: {num_images_per_instance}')
         distributed_datasets = preprocess.distribute_dataset(Auto_annotated_folder, dest_root_folder, num_images_per_instance*0.9, num_images_per_instance*0.1, num_instances, True)
         print(f'distributed_datasets {distributed_datasets}')
@@ -388,21 +373,15 @@ def iterative_auto_labeling(main_dataset_dir, num_images_per_instance, num_insta
         print(f"Auto-labeling complete for iteration:{iteration}")
         iteration += 1
         num_remaining_unlabeled_images = sum(os.path.isfile(os.path.join(unlabeled_images_folder, f)) for f in os.listdir(unlabeled_images_folder))
-        print(f"Number of unlabeled images: {num_remaining_unlabeled_images}")
         torch.cuda.empty_cache()  # Clear GPU memory if using CUDA
 
 
     # after exiting the while loop, annotate the left images
     if num_remaining_unlabeled_images > 0:
-      print(f"if 1: EXIT While loop")
-
       # Auto-annotate the next set of unlabeled images
       Pseudo_labels_folders = train.Pseudo_Labeling(best_model_paths, unlabeled_images_folder, iteration)
-      print(f"len of Pseudo_labels_folders 1 = {len(os.listdir('/content/SSOD/pseudo-labels-1/labels-model-0'))}")
-      print(f"len of Pseudo_labels_folders 1 = {len(os.listdir('/content/SSOD/pseudo-labels-1/labels-model-1'))}")
-
+        
       # Process the predictions from the Pseudo Labeling
-      print("Processing predictions...")
       final_predictions = process_predictions(Pseudo_labels_folders, image_width = img_size, image_height = img_size, iou_threshold = threshold_val, ScoreBased = ScoreBased, ScoreThreshold = ScoreThreshold )
 
       final_predictions_list.append(final_predictions)
@@ -419,7 +398,6 @@ def iterative_auto_labeling(main_dataset_dir, num_images_per_instance, num_insta
 
       #update the unlabeled data
       print("Updating unlabeled data ...")
-      print(f'before updating unlabeled images folder, {num_remaining_unlabeled_images}')
       Auto_annotated_folder = preprocess.update_unlabeled_folder( unlabeled_images_folder, unlabeled_images_folder, output_folder, iteration_auto_annotated_folder_path, True)
       num_remaining_unlabeled_images = sum(os.path.isfile(os.path.join(unlabeled_images_folder, f)) for f in os.listdir(unlabeled_images_folder))
       num_auto_annotated_labels = sum(os.path.isfile(os.path.join(Auto_annotated_folder, f)) for f in os.listdir(Auto_annotated_folder))
@@ -487,7 +465,7 @@ def iterative_auto_labeling(main_dataset_dir, num_images_per_instance, num_insta
       ]
 
       # Prepare the auto-annotated dataset
-      print("Preparing auto-annotated dataset...")
+      print("Preparing auto-annotated dataset")
       merged_folder = f"{HOME}/merged_folder"
       os.makedirs(merged_folder, exist_ok=True)
 
