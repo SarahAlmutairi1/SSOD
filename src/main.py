@@ -103,6 +103,7 @@ def main(iteration ,main_dataset_dir, class_names, img_size, num_instances, epoc
 
     ground_truth_folder = f'{main_dataset_dir}/valid/labels'  # Folder containing ground truth label
     print(f"Files in ground_truth_folder: {len(os.listdir(f'{ground_truth_folder}'))}")
+    Labels_quality = {}
     Labels_quality = evaluate.evaluate_predictions(output_folder, ground_truth_folder, class_names)
 
     end_time = time.time()
@@ -116,9 +117,10 @@ def main(iteration ,main_dataset_dir, class_names, img_size, num_instances, epoc
     Final_auto_annotated_dataset = f'{HOME}/Final_auto_annotated_dataset'
 
     # Train the YOLO model using the auto-annotated labels
-    model, Train_time = train.train_final_model(iteration, Final_auto_annotated_dataset, img_size, 1)
+    model, Train_time = train.train_final_model(iteration, Final_auto_annotated_dataset, img_size, 200)
 
     # Evaluate the model
+    metrics = {}
     metrics = evaluate.evaluate_final_model(model, main_dataset_dir, img_size)
 
     # Log results
@@ -138,10 +140,10 @@ if __name__ == "__main__":
         "pottedplant", "sheep", "sofa", "train", "tvmonitor"]
 
     img_size = 640
-    epochs_per_iteration = 1
-    num_instances_list = [2]
-    threshold_values = [0.8]
-    score_based_options = [True]
+    epochs_per_iteration = 50
+    num_instances_list = [2,6]
+    threshold_values = [0.5]
+    score_based_options = [False]
     score_thresholds = [0.8]
 
     # run the experiment
