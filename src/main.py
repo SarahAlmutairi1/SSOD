@@ -7,7 +7,29 @@ import evaluate
 import csv
 from config import HOME
 from ultralytics import settings
+import shutil
+from datetime import datetime
 import subprocess
+def save_output_file():
+    # Define local file path 
+    local_path = '/content/SSOD/output/results.csv'  # change if needed
+    
+    # Define target subfolder in Drive
+    drive_folder = '/content/drive/MyDrive/ML_Results'
+    
+    # Create the folder if it doesn't exist
+    os.makedirs(drive_folder, exist_ok=True)
+    
+    # Generate unique filename with timestamp
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    drive_filename = f'results_{timestamp}.csv'
+    
+    # Full path in Drive
+    drive_path = os.path.join(drive_folder, drive_filename)
+    
+    shutil.copy(local_path, drive_path)
+    print(f"✅ File saved to: {drive_path}")
+    
 def log_results(num_instances, threshold_val, ScoreBased, ScoreThreshold, processing_time, Train_time, metrics, Labels_quality, save_path, filename="results.csv"):
     """
     Logs experiment results into a CSV file at a specified path.
@@ -125,7 +147,7 @@ def main(iteration ,main_dataset_dir, class_names, img_size, num_instances, epoc
 
     # Log results
     log_results(num_instances, threshold_val, ScoreBased, ScoreThreshold, processing_time, Train_time,metrics, Labels_quality, save_path)
-
+    
 
 # Main execution
 if __name__ == "__main__":
@@ -141,10 +163,10 @@ if __name__ == "__main__":
 
     img_size = 640
     epochs_per_iteration = 50
-    num_instances_list = [2,6]
-    threshold_values = [0.5]
-    score_based_options = [False]
-    score_thresholds = [0.8]
+    num_instances_list = [3,5,7,9,11]
+    threshold_values = [0.5, 0.7, 0.9]
+    score_based_options = [False, True]
+    score_thresholds = [0.5, 0.7, 0.9]
 
     # run the experiment
     iteration = 0
@@ -156,8 +178,17 @@ if __name__ == "__main__":
                       iteration += 1 
                       print(f"Running with: num_instances={num_instances}, threshold_val={threshold_val}, ScoreBased={ScoreBased}, ScoreThreshold={ScoreThreshold}")
                       main(iteration, main_dataset_dir, class_names, img_size, num_instances,epochs_per_iteration, threshold_val, ScoreBased, ScoreThreshold, output_path)
+                      # This runs every 3 experiments
+                      if iteration % 3 == 0:
+                          save_output_file()
+                          
+                        
                 else:
                   ScoreThreshold = 0    # neglected since scoreBased is False
                   iteration += 1 
                   print(f"Running with: num_instances={num_instances}, threshold_val={threshold_val}, ScoreBased={ScoreBased}, ScoreThreshold neglected")
                   main( iteration, main_dataset_dir, class_names, img_size, num_instances,epochs_per_iteration, threshold_val, ScoreBased, ScoreThreshold, output_path)
+                  # This runs every 3 experiments
+                  if iteration % 3 == 0:
+                      save_output_file()
+                        
