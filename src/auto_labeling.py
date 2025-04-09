@@ -73,7 +73,6 @@ def read_all_predictions(models_folders, image_width, image_height, ScoreBased, 
                 else:
                     print(f"No detection file found, skipping: {file_path}")
             if image_predictions:  # Only add if there are any predictions
-                print("predictions added !")
                 all_predictions[image_file] = image_predictions
 
     return all_predictions
