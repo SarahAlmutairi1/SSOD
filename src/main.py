@@ -77,7 +77,7 @@ def log_results(num_instances, threshold_val, ScoreBased, ScoreThreshold, proces
 
     print(f"Results logged in: {file_path}")
 
-def main(iteration ,main_dataset_dir, class_names, img_size, num_instances, epochs_per_iteration, threshold_val, ScoreBased, ScoreThreshold, save_path):
+def ETSR(iteration ,main_dataset_dir, class_names, img_size, num_instances, epochs_per_iteration, threshold_val, ScoreBased, ScoreThreshold, save_path):
     """
     Main function that drives the iterative auto-labeling process and model training
     with auto-annotated labels.
@@ -149,10 +149,7 @@ def main(iteration ,main_dataset_dir, class_names, img_size, num_instances, epoc
     shutil.rmtree(Final_auto_annotated_dataset)
     shutil.rmtree(output_folder)
 
-# Main execution
-if __name__ == "__main__":
-    
-    # Call the main
+def main():
     main_dataset_dir = f'{HOME}/src/datasets/VOC1'  # dataset path
     output_path = f'{HOME}/output'  # output folder path
 
@@ -177,18 +174,21 @@ if __name__ == "__main__":
                   for ScoreThreshold in score_thresholds:
                       iteration += 1 
                       print(f"Running with: num_instances={num_instances}, threshold_val={threshold_val}, ScoreBased={ScoreBased}, ScoreThreshold={ScoreThreshold}")
-                      main(iteration, main_dataset_dir, class_names, img_size, num_instances,epochs_per_iteration, threshold_val, ScoreBased, ScoreThreshold, output_path)
+                      ETSR(iteration, main_dataset_dir, class_names, img_size, num_instances,epochs_per_iteration, threshold_val, ScoreBased, ScoreThreshold, output_path)
                       # This runs every 3 experiments
                       if iteration % 3 == 0:
                           save_output_file()
                           
-                        
                 else:
                   ScoreThreshold = 0    # neglected since scoreBased is False
                   iteration += 1 
                   print(f"Running with: num_instances={num_instances}, threshold_val={threshold_val}, ScoreBased={ScoreBased}, ScoreThreshold neglected")
-                  main( iteration, main_dataset_dir, class_names, img_size, num_instances,epochs_per_iteration, threshold_val, ScoreBased, ScoreThreshold, output_path)
+                  ETSR( iteration, main_dataset_dir, class_names, img_size, num_instances,epochs_per_iteration, threshold_val, ScoreBased, ScoreThreshold, output_path)
                   # This runs every 3 experiments
                   if iteration % 3 == 0:
                       save_output_file()
                         
+
+# Main execution
+if __name__ == "__main__":
+    main()
