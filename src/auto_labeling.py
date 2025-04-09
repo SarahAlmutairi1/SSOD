@@ -425,7 +425,7 @@ def iterative_auto_labeling(main_dataset_dir, num_images_per_instance, num_insta
       print("Auto-annotated dataset prepared.")
 
       # Preparing the final auto annotated datasets
-      Final_output_folder = f"{HOME}/Final_auto_annotated_dataset"
+      Final_output_folder = f"{HOME}/Final_auto_annotated_dataset_{iteration}"
       if os.path.exists(Final_output_folder):
         shutil.rmtree(Final_output_folder)
       os.makedirs(Final_output_folder, exist_ok=True)
