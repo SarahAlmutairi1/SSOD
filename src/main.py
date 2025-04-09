@@ -147,6 +147,7 @@ def main(iteration ,main_dataset_dir, class_names, img_size, num_instances, epoc
     # Log results
     log_results(num_instances, threshold_val, ScoreBased, ScoreThreshold, processing_time, Train_time,metrics, Labels_quality, save_path)
     shutil.rmtree(Final_auto_annotated_dataset)
+    shutil.rmtree(output_folder)
 
 # Main execution
 if __name__ == "__main__":
