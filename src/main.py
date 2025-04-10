@@ -144,12 +144,12 @@ def ETSR(iteration ,main_dataset_dir, class_names, img_size, num_instances, epoc
         print(f"Final_auto_annotated_dataset_{iteration} does not exist.")
         sys.exit()
         
-    if not os.path.exists(Final_auto_annotated_dataset):
-        print(f"Final_auto_annotated_dataset_{iteration} does not exist.")
+    if not os.path.exists(f'{Final_auto_annotated_dataset}/data.yaml):
+        print(f"Final_auto_annotated_dataset_{iteration}/data.yaml does not exist.")
         sys.exit()
         
     # Train the YOLO model using the auto-annotated labels
-    model, Train_time = train.train_final_model(iteration, Final_auto_annotated_dataset, img_size, 100)
+    model, Train_time = train.train_final_model(iteration, Final_auto_annotated_dataset, img_size, 10)
 
     # Evaluate the model
     metrics = evaluate.evaluate_final_model(model, main_dataset_dir, img_size)
@@ -167,7 +167,7 @@ def main():
         "pottedplant", "sheep", "sofa", "train", "tvmonitor"]
 
     img_size = 640
-    epochs_per_iteration = 50
+    epochs_per_iteration = 5
     num_instances_list = [3,5,7,9,11]
     threshold_values = [0.5, 0.7, 0.9]
     score_based_options = [False, True]
