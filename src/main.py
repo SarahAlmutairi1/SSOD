@@ -138,6 +138,9 @@ def ETSR(iteration ,main_dataset_dir, class_names, img_size, num_instances, epoc
     # Define the path for the final auto-annotated dataset
     Final_auto_annotated_dataset = f'{HOME}/Final_auto_annotated_dataset_{iteration}'
 
+    if not os.path.exists(path):
+        print("Final_auto_annotated_dataset does not exist.")
+        sys.exit()
     # Train the YOLO model using the auto-annotated labels
     model, Train_time = train.train_final_model(iteration, Final_auto_annotated_dataset, img_size, 100)
 
