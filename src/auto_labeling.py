@@ -11,7 +11,6 @@ import preprocess
 import train 
 import evaluate
 import glob
-from IPython.display import clear_output
 from collections import Counter
 
 def read_predictions_from_file(file_path, image_width, image_height, ScoreBased, ScoreThreshold):
@@ -445,7 +444,6 @@ def iterative_auto_labeling(main_dataset_dir, num_images_per_instance, num_insta
         for folder in glob.glob(pattern):
           if os.path.isdir(folder):
             shutil.rmtree(folder)
-      clear_output()
       return final_predictions_list
 
     else:
@@ -495,5 +493,4 @@ def iterative_auto_labeling(main_dataset_dir, num_images_per_instance, num_insta
         for folder in glob.glob(pattern):
           if os.path.isdir(folder):
             shutil.rmtree(folder)
-      clear_output()
       return final_predictions_list
