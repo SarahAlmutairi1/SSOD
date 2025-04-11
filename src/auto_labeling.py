@@ -420,23 +420,12 @@ def iterative_auto_labeling(main_dataset_dir, num_images_per_instance, num_insta
       os.makedirs(merged_folder, exist_ok=True)
 
       preprocess.merge_datasets(auto_annotated_datasets_folders, merged_folder)
-      print("Auto-annotated dataset prepared.")
-
-      # Preparing the final auto annotated datasets
-      Final_output_folder = f"{HOME}/Final_auto_annotated_dataset_{iteration}"
-      if os.path.exists(Final_output_folder):
-        shutil.rmtree(Final_output_folder)
-      os.makedirs(Final_output_folder, exist_ok=True)
-
-      preprocess.resplit_dataset(merged_folder, Final_output_folder, train_ratio = 0.9, test_ratio = 0.0, val_ratio= 0.1, seed=42)
-      print("Dataset Ready")
-
+    
       # remove all folders creates except Final output folder
       shutil.rmtree(distributed_datasets)
       shutil.rmtree(remaining_unlabeled_images)
       shutil.rmtree(auto_annotated_folders)
       shutil.rmtree(manually_labeled_folder_merged)
-      shutil.rmtree(merged_folder)
       shutil.rmtree(output_folder)
       shutil.rmtree(os.path.join(HOME, 'runs'))
       patterns = [os.path.join(HOME, "pseudo-labels-*"), os.path.join(HOME, "unlabeled_dataset_*")]
@@ -468,24 +457,12 @@ def iterative_auto_labeling(main_dataset_dir, num_images_per_instance, num_insta
 
       # merge the auto-annotated datasets
       preprocess.merge_datasets(auto_annotated_datasets_folders, merged_folder)
-      print("Auto-annotated dataset prepared.")
-
-      # Preparing the final auto annotated datasets
-      Final_output_folder = f"{HOME}/Final_auto_annotated_dataset"
-      if os.path.exists(Final_output_folder):
-        shutil.rmtree(Final_output_folder)
-      os.makedirs(Final_output_folder, exist_ok=True)
-
-      # split the output folder
-      preprocess.resplit_dataset(merged_folder, Final_output_folder, train_ratio = 0.9, test_ratio = 0.0, val_ratio= 0.1, seed=42)
-      print("Dataset Ready")
-
+     
       #remove all folders creates except Final output folder
       shutil.rmtree(distributed_datasets)
       shutil.rmtree(remaining_unlabeled_images)
       shutil.rmtree(auto_annotated_folders)
       shutil.rmtree(manually_labeled_folder_merged)
-      shutil.rmtree(merged_folder)
       shutil.rmtree(output_folder)
       shutil.rmtree(os.path.join(HOME, 'runs'))
       patterns = [os.path.join(HOME, "pseudo-labels-*"), os.path.join(HOME, "unlabeled_dataset_*")]
