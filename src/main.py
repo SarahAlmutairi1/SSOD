@@ -132,13 +132,19 @@ def ETSR(iteration ,main_dataset_dir, class_names, img_size, num_instances, epoc
     print(f"Files in ground_truth_folder: {len(os.listdir(f'{ground_truth_folder}'))}")
     Labels_quality = evaluate.evaluate_predictions(output_folder, ground_truth_folder, class_names)
 
-
     # Calculate the processing_time in minutes
     processing_time = (end_time - start_time) / 60
     print(f"processing_time: {processing_time:.2f} minutes")
 
-    # Define the path for the final auto-annotated dataset
+    # Preparing the final auto annotated dataset
     Final_auto_annotated_dataset = f'{HOME}/Final_auto_annotated_dataset_{iteration}'
+    if os.path.exists(Final_auto_annotated_dataset):
+        shutil.rmtree(Final_auto_annotated_dataset)
+    os.makedirs(Final_auto_annotated_dataset, exist_ok=True)
+
+    # split the output folder
+    preprocess.resplit_dataset(merged_folder, Final_auto_annotated_dataset, train_ratio = 0.9, test_ratio = 0.0, val_ratio= 0.1, seed=42)
+    print("Dataset Ready")
 
     if not os.path.exists(Final_auto_annotated_dataset):
         print(f"Final_auto_annotated_dataset_{iteration} does not exist.")
