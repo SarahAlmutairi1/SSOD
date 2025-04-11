@@ -141,7 +141,8 @@ def ETSR(iteration ,main_dataset_dir, class_names, img_size, num_instances, epoc
     if os.path.exists(Final_auto_annotated_dataset):
         shutil.rmtree(Final_auto_annotated_dataset)
     os.makedirs(Final_auto_annotated_dataset, exist_ok=True)
-
+    merged_folder = f"{HOME}/merged_folder"
+    
     # split the output folder
     preprocess.resplit_dataset(merged_folder, Final_auto_annotated_dataset, train_ratio = 0.9, test_ratio = 0.0, val_ratio= 0.1, seed=42)
     print("Dataset Ready")
