@@ -4,6 +4,7 @@ import dataset
 import train
 import auto_labeling
 import evaluate
+import preprocess
 import csv
 from config import HOME
 from ultralytics import settings
@@ -151,7 +152,7 @@ def ETSR(iteration ,main_dataset_dir, class_names, img_size, num_instances, epoc
         print(f"Final_auto_annotated_dataset_{iteration} does not exist.")
         sys.exit()
         
-    if not os.path.exists(f'{Final_auto_annotated_dataset}/data.yaml):
+    if not os.path.exists(f'{Final_auto_annotated_dataset}/data.yaml'):
         print(f"Final_auto_annotated_dataset_{iteration}/data.yaml does not exist.")
         sys.exit()
         
