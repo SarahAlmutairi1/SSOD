@@ -164,6 +164,9 @@ def ETSR(iteration ,main_dataset_dir, class_names, img_size, num_instances, epoc
     # Log results
     log_results(num_instances, threshold_val, ScoreBased, ScoreThreshold, processing_time, Train_time,metrics, Labels_quality, save_path)
 
+    # del
+    shutil.rmtree(f"{HOME}/merged_folder")
+    shutil.rmtree(f'{HOME}/Final_auto_annotated_dataset_{iteration}')
 def main():
     main_dataset_dir = f'{HOME}/src/datasets/VOC1'  # dataset path
     output_path = f'{HOME}/output'  # output folder path
