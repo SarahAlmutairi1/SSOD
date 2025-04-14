@@ -206,8 +206,9 @@ def main():
                   # This runs every 3 experiments
                   if iteration % 3 == 0:
                       save_output_file()
-                        
-
+    # Final save to handle any remaining experiments
+    if iteration % 3 != 0:
+        save_output_file()
 # Main execution
 if __name__ == "__main__":
     main()
