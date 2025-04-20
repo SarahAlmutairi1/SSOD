@@ -17,16 +17,16 @@ def train_single_instance(dataset_path, epochs_per_iteration, model, img_size):
     try:
         # Initialize model
         if model is not None:
-            print(f"Loading model from teacher model")
+            print(f"Loading teacher model")
             model = YOLO(model)
             PretrainedVal = True
         else:
-            print(f"Loading model yolov8n.yaml")
+            print(f"Loading yolov8n.yaml")
             model = YOLO('yolo11n.pt')
             PretrainedVal = False
 
         # Train the model
-        results = model.train(data=f'{dataset_path}/data.yaml', epochs=epochs_per_iteration, imgsz=img_size, plots=True, patience = 10, augment=True, project=f'{HOME}/runs') #, pretrained= PretrainedVal)
+        results = model.train(data=f'{dataset_path}/data.yaml', epochs=epochs_per_iteration, imgsz=img_size, plots=True, patience = 10, augment=True, project=f'{HOME}/runs') 
         save_dir = results.save_dir  # Get the save directory
 
         print(f"Model saved to: {save_dir}")
@@ -43,8 +43,8 @@ def train_single_instance(dataset_path, epochs_per_iteration, model, img_size):
         print(f"Error training model on {dataset_path}: {e}")
         traceback.print_exc()
         return None, None
-'''
-def train_multiple_instances(datasets, epochs_per_iteration, trained_models_paths):
+
+def train_multiple_instances(datasets, epochs_per_iteration, trained_models_paths, img_size):
     """Train multiple YOLO models on different datasets in parallel using ProcessPoolExecutor."""
     best_model_paths = []
     model_performance = []
@@ -55,7 +55,7 @@ def train_multiple_instances(datasets, epochs_per_iteration, trained_models_path
         print(f"process pool executor")
         # Prepare futures for parallel training tasks
         futures = [
-            executor.submit(train_single_instance, dataset, epochs_per_iteration, model)
+            executor.submit(train_single_instance, dataset, epochs_per_iteration, model, img_size)
             for dataset, model in zip(datasets, trained_models_paths)
         ]
 
@@ -68,7 +68,7 @@ def train_multiple_instances(datasets, epochs_per_iteration, trained_models_path
                 model_performance.append(metrics)
 
     return best_model_paths, model_performance
-
+'''
 def train_single_instance(dataset_path, epochs_per_iteration, model):
     """Train a single YOLO instance and return the best model path and its performance."""
     if model is not None:
@@ -85,7 +85,7 @@ def train_single_instance(dataset_path, epochs_per_iteration, model):
     metrics = results.maps.mean()
 
     return best_model_path, metrics
-'''
+
 def train_multiple_instances(datasets, epochs_per_iteration, trained_models_paths, img_size):
     """Train multiple YOLO models on different datasets and return best model paths and performance metrics."""
     best_model_paths = []
@@ -99,7 +99,7 @@ def train_multiple_instances(datasets, epochs_per_iteration, trained_models_path
 
     #torch.cuda.empty_cache()  # Clear GPU memory after training
     return best_model_paths, model_performance
-
+'''
 def check_model_paths(paths):
   '''
   function to delete any extra folders that could be created during parallel training
