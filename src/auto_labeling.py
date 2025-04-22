@@ -305,7 +305,7 @@ def iterative_auto_labeling(main_dataset_dir, num_images_per_instance, num_insta
         iteration_folder_name = f'unlabeled_dataset_{iteration}'
         iteration_folder_path = os.path.join(HOME, iteration_folder_name)
 
-        unlabeled_dataset = preprocess.move_images(remaining_unlabeled_images, iteration_folder_path, images_per_iteration)
+        unlabeled_dataset = preprocess.move_images(remaining_unlabeled_images, iteration_folder_path, images_per_iteration+100)
         del iteration_folder_name
         del iteration_folder_path
 
