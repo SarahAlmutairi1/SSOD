@@ -10,20 +10,22 @@ import torch
 import torch.multiprocessing as mp
 from config import HOME
 
-def train_single_instance(dataset_path, epochs_per_iteration, model, img_size):
+def train_single_instance(dataset_path, epochs_per_iteration, model, img_size, iteration, RetrainAll):
     """Train a single YOLO instance and return the best model path and its performance."""
 
-    PretrainedVal = False
     try:
-        # Initialize model
-        if model is not None:
-            print(f"Loading teacher model")
-            model = YOLO(model)
-            PretrainedVal = True
+        if RetrainAll and iteration % 3 == 0:
+          print(f"Loading yolov8n.yaml")
+          model = YOLO('yolo11n.pt')
+
+        elif model is not None:
+          print(f"Loading teacher model")
+          model = YOLO(model)
+
         else:
-            print(f"Loading yolov8n.yaml")
-            model = YOLO('yolo11n.pt')
-            PretrainedVal = False
+          print(f"Loading yolov8n.yaml")
+          model = YOLO('yolo11n.pt')
+
 
         # Train the model
         results = model.train(data=f'{dataset_path}/data.yaml', epochs=epochs_per_iteration, imgsz=img_size, plots=True, patience = 10, augment=True, project=f'{HOME}/runs') 
@@ -37,14 +39,14 @@ def train_single_instance(dataset_path, epochs_per_iteration, model, img_size):
 
         # Performance metrics
         metrics = results.maps.mean()
-
         return best_model_path, metrics
+        
     except Exception as e:
         print(f"Error training model on {dataset_path}: {e}")
         traceback.print_exc()
         return None, None
 
-def train_multiple_instances(datasets, epochs_per_iteration, trained_models_paths, img_size):
+def train_multiple_instances(datasets, epochs_per_iteration, trained_models_paths, img_size, iteration, RetrainAll):
     """Train multiple YOLO models on different datasets in parallel using ProcessPoolExecutor."""
     best_model_paths = []
     model_performance = []
@@ -55,7 +57,7 @@ def train_multiple_instances(datasets, epochs_per_iteration, trained_models_path
         print(f"process pool executor")
         # Prepare futures for parallel training tasks
         futures = [
-            executor.submit(train_single_instance, dataset, epochs_per_iteration, model, img_size)
+            executor.submit(train_single_instance, dataset, epochs_per_iteration, model, img_size,iteration, RetrainAll)
             for dataset, model in zip(datasets, trained_models_paths)
         ]
 
@@ -67,6 +69,7 @@ def train_multiple_instances(datasets, epochs_per_iteration, trained_models_path
                 best_model_paths.append(best_model_path)
                 model_performance.append(metrics)
 
+    torch.cuda.empty_cache()  # Clear GPU memory after training
     return best_model_paths, model_performance
 '''
 def train_single_instance(dataset_path, epochs_per_iteration, model):
