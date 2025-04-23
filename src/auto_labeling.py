@@ -193,10 +193,15 @@ def save_predictions(predictions, output_folder, image_width, image_height):
               bbox_str = ' '.join(map(str, bbox))
               f.write(f"{class_id} {bbox_str}\n")
 
-def iterative_auto_labeling(main_dataset_dir, num_images_per_instance, num_instances, epochs_per_iteration, img_size, class_names ,threshold_val, ScoreBased, ScoreThreshold):
+def iterative_auto_labeling(Iterative, main_dataset_dir, num_images_per_instance, num_instances, epochs_per_iteration, img_size, class_names ,threshold_val, ScoreBased, ScoreThreshold):
     iteration = 0
-    RetrainAll = False
-    images_per_iteration = 500
+
+    if Iterative:
+      RetrainAll = True
+      images_per_iteration = num_instances*500
+    else:
+      RetrainAll = False
+      images_per_iteration = num_instances*num_images_per_instance
 
     # Prepare the datasets folder
     if not os.path.exists(main_dataset_dir):
@@ -273,16 +278,15 @@ def iterative_auto_labeling(main_dataset_dir, num_images_per_instance, num_insta
 
     num_remaining_unlabeled_images = sum(os.path.isfile(os.path.join(unlabeled_images_folder, f)) for f in os.listdir(unlabeled_images_folder))
 
-    # Start iterative auto-labeling
+    # Start Auto-labeling
     while num_remaining_unlabeled_images >= images_per_iteration:
         print(f"Starting iteration {iteration}...")
         print(f"Remaining unlabeled images: {num_remaining_unlabeled_images}")
 
         # Train each YOLO model using the distributed datasets
-        print("Training YOLO models...")
-        best_model_paths, model_performance = train.train_multiple_instances(distributed_datasets_folders, epochs_per_iteration, best_models, img_size, RetrainAll)
-        print(f'best model paths: {best_model_paths}')
-        print(f'Training iteration #{iteration}')
+        print("Training Teacher models")
+        best_model_paths, model_performance = train.train_multiple_instances(distributed_datasets_folders, epochs_per_iteration, best_models, img_size, iteration, RetrainAll) ##Add iteration##
+  
         print(f'model_performance: {model_performance}')
         train.check_model_paths(best_model_paths)
         best_models = best_model_paths
@@ -290,7 +294,6 @@ def iterative_auto_labeling(main_dataset_dir, num_images_per_instance, num_insta
         # Check models' performance, if all have mAP >= 0.8, no need to split the data and train the models again.
         # Stop and auto-annotate all remaining unlabeled data
         exit = [False] * num_instances
-
         for i, performance in enumerate(model_performance):
           if performance >= 0.8:
             print(f'Model no.{i}: performance {performance}')
@@ -301,11 +304,15 @@ def iterative_auto_labeling(main_dataset_dir, num_images_per_instance, num_insta
           print("All models meet condition. EXIT.")
           break
 
-        # Define the unlabeled folder name for the current iteration
+        # Define the unlabeled folder name for the current iteration to be pseudo-labeled
         iteration_folder_name = f'unlabeled_dataset_{iteration}'
         iteration_folder_path = os.path.join(HOME, iteration_folder_name)
 
-        unlabeled_dataset = preprocess.move_images(remaining_unlabeled_images, iteration_folder_path, images_per_iteration+100)
+        if Iterative:
+          unlabeled_dataset = preprocess.move_images(remaining_unlabeled_images, iteration_folder_path, images_per_iteration+100)
+        else:
+          unlabeled_dataset = preprocess.move_images(remaining_unlabeled_images, iteration_folder_path, images_per_iteration)
+        
         del iteration_folder_name
         del iteration_folder_path
 
@@ -323,7 +330,7 @@ def iterative_auto_labeling(main_dataset_dir, num_images_per_instance, num_insta
         print("Final predictions saved.")
 
         # if the final predicted pseudo labels are less than needed no. of images_per_iteration, stop
-        if len(os.listdir(output_folder)) < images_per_iteration:
+        if len(os.listdir(output_folder)) < images_per_iteration or Iterative == False:
           iteration += 1
           print("Not enough auto-annotated labels to continue.")
           break
@@ -349,6 +356,32 @@ def iterative_auto_labeling(main_dataset_dir, num_images_per_instance, num_insta
         dest_root_folder = os.path.join(HOME, "distributed-dataset")
         if not os.path.exists(dest_root_folder):
           os.makedirs(dest_root_folder)
+        
+        # Every 3 iteratione retrain teachers from the start
+        if RetrainAll and iteration % 3 == 0:
+          
+          print("Prepare data for retraining all teachers")
+          # Define the auto-annotated folder name for the current iteration
+          iteration_auto_annotated_folder_name = f'auto_annotated_{iteration}_Retrain'
+          iteration_auto_annotated_folder_path = os.path.join(HOME, auto_annotated_folders ,iteration_auto_annotated_folder_name)
+
+          # add the initial split to the auto annotated folders
+          shutil.copytree(manually_labeled_folder_merged, iteration_auto_annotated_folder_path, dirs_exist_ok=True)
+          
+          # Get a list of the auto-annotated datasets directories
+          auto_annotated_datasets_folders = [
+            os.path.join(auto_annotated_folders, folder_name)
+            for folder_name in os.listdir(auto_annotated_folders)
+            if os.path.isdir(os.path.join(auto_annotated_folders, folder_name))
+          ]
+
+          #Prepare the auto-annotated dataset
+          print("Preparing auto-annotated dataset...")
+          Auto_annotated_folder = f"{HOME}/Auto_annotated_folder_{iteration}_Retrain"
+          os.makedirs(Auto_annotated_folder, exist_ok=True)
+
+          preprocess.merge_datasets(auto_annotated_datasets_folders, Auto_annotated_folder)
+
 
         #update the distributed folder using the auto-annotated data
         print("Creating distributed folder")
@@ -362,6 +395,7 @@ def iterative_auto_labeling(main_dataset_dir, num_images_per_instance, num_insta
             for folder_name in os.listdir(distributed_datasets)
             if os.path.isdir(os.path.join(distributed_datasets, folder_name))
             ]
+
         print(f"Auto-labeling complete for iteration:{iteration}")
         iteration += 1
         num_remaining_unlabeled_images = sum(os.path.isfile(os.path.join(unlabeled_images_folder, f)) for f in os.listdir(unlabeled_images_folder))
@@ -422,7 +456,7 @@ def iterative_auto_labeling(main_dataset_dir, num_images_per_instance, num_insta
       shutil.rmtree(manually_labeled_folder_merged)
       shutil.rmtree(output_folder)
       shutil.rmtree(os.path.join(HOME, 'runs'))
-      patterns = [os.path.join(HOME, "pseudo-labels-*"), os.path.join(HOME, "unlabeled_dataset_*")]
+      patterns = [os.path.join(HOME, "pseudo-labels-*"), os.path.join(HOME, "unlabeled_dataset_*"), os.path.join(HOME, "Auto_annotated_folder_*_Retrain")]
       for pattern in patterns:
         for folder in glob.glob(pattern):
           if os.path.isdir(folder):
@@ -459,7 +493,7 @@ def iterative_auto_labeling(main_dataset_dir, num_images_per_instance, num_insta
       shutil.rmtree(manually_labeled_folder_merged)
       shutil.rmtree(output_folder)
       shutil.rmtree(os.path.join(HOME, 'runs'))
-      patterns = [os.path.join(HOME, "pseudo-labels-*"), os.path.join(HOME, "unlabeled_dataset_*")]
+      patterns = [os.path.join(HOME, "pseudo-labels-*"), os.path.join(HOME, "unlabeled_dataset_*"), os.path.join(HOME, "Auto_annotated_folder_*_Retrain")]
       for pattern in patterns:
         for folder in glob.glob(pattern):
           if os.path.isdir(folder):
