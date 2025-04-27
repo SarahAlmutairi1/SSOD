@@ -181,9 +181,9 @@ def main():
     img_size = 640
     epochs_per_iteration = 30
     num_instances_list = [3,5,7,9,11]
-    threshold_values = [0.5, 0.7, 0.9]
-    score_based_options = [False, True]
-    score_thresholds = [0.5, 0.7, 0.9]
+    threshold_values = [0.5]
+    score_based_options = [False]
+    score_thresholds = [0]
 
     # run the experiment
     iteration = 0
