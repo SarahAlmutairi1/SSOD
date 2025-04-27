@@ -283,10 +283,10 @@ def update_unlabeled_folder(iteration_unlabeled_folder , main_unlabeled_folder, 
     If a label does not exist for an image in the final set, move this image to the main_unlabeled_folder.
 
     Parameters:
-    - main_unlabeled_folder: The main unlabeled folder containing images without labels.
-    - Auto_annotated_folder: The folder where images and auto-annotated labels will be moved.
-    - final_labels_folder: The folder containing the final set of auto-annotated labels.
     - iteration_unlabeled_folder: The folder containing current iteration images
+    - main_unlabeled_folder: The main unlabeled folder containing images without labels.
+    - final_labels_folder: The folder containing the final set of auto-annotated labels.
+    - Auto_annotated_folder: The folder where images and auto-annotated labels will be moved.
     """
 
     # Ensure the Auto_annotated_folder exists
