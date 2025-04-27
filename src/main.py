@@ -12,6 +12,7 @@ import shutil
 from datetime import datetime
 import subprocess
 import sys
+import torch.multiprocessing as mp
 
 def save_output_file():
     # Define local file path 
@@ -210,6 +211,8 @@ def main():
     # Final save to handle any remaining experiments
     if iteration % 3 != 0:
         save_output_file()
+        
 # Main execution
-if __name__ == "__main__":
+if __name__ == '__main__':
+    mp.set_start_method('spawn')
     main()
