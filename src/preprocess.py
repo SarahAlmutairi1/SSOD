@@ -104,7 +104,7 @@ def resplit_dataset(dataset_folder, dest_root_folder, train_ratio, test_ratio, v
     print(f"Resplit dataset into {train_ratio*100}% train, {test_ratio*100}% test, {val_ratio*100}% val.")
     return dest_root_folder
 
-def distribute_dataset( source_folder, dest_root_folder, num_img_train, num_img_val, num_dest_folders, ignore_Remaining_images):
+def distribute_dataset( source_folder, dest_root_folder, num_img_train, num_img_val, num_dest_folders, class_names ,ignore_Remaining_images):
     """
     Distribute dataset images and labels into multiple destination folders with `data.yaml`.
 
@@ -224,15 +224,18 @@ def distribute_dataset( source_folder, dest_root_folder, num_img_train, num_img_
     print(f"Distributed images into {dest_folder_idx} folders.")
 
     # Load class information from the main data.yaml in the source folder
-    if is_auto_folder:
-        main_data_yaml_path = os.path.join( source_folder, 'data.yaml')
-    else:
-        main_data_yaml_path = os.path.join(source_folder, 'data.yaml')
-    with open(main_data_yaml_path, 'r') as file:
-        main_data_yaml = yaml.safe_load(file)
-        classes = main_data_yaml.get('names', [])
-        num_classes = main_data_yaml.get('nc', len(classes))
+    main_data_yaml_path = os.path.join(source_folder, 'data.yaml')
 
+    if not os.path.exists(main_data_yaml_path):
+        print(f"No data.yaml found in {source_folder}, creating a default one.") 
+        classes = class_names
+        num_classes = len(class_names)
+    else:
+        with open(main_data_yaml_path, 'r') as file:
+            main_data_yaml = yaml.safe_load(file)
+            classes = main_data_yaml.get('names', [])
+            num_classes = main_data_yaml.get('nc', len(classes))
+            
     # Create dynamic data.yaml files
     for i in range(1, dest_folder_idx + 1):
       dest_folder = os.path.join(dest_root_folder, f'folder_{i}')
