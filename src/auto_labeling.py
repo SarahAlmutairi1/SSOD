@@ -215,7 +215,7 @@ def iterative_auto_labeling(Iterative, main_dataset_dir, num_images_per_instance
       os.makedirs(dest_root_folder)
 
     # distribute dataset in seperate folders for training
-    remaining_unlabeled_images, distributed_datasets = preprocess.distribute_dataset(main_dataset_dir, dest_root_folder, num_images_per_instance*0.9, num_images_per_instance*0.1, num_instances, False)
+    remaining_unlabeled_images, distributed_datasets = preprocess.distribute_dataset(main_dataset_dir, dest_root_folder, num_images_per_instance*0.9, num_images_per_instance*0.1, num_instances, class_names ,False)
 
     # Save the initial split to merge it later with the final dataset
     manually_labeled_folder = os.path.join(HOME, "manually_labeled_folder")
@@ -382,11 +382,13 @@ def iterative_auto_labeling(Iterative, main_dataset_dir, num_images_per_instance
 
           preprocess.merge_datasets(auto_annotated_datasets_folders, Auto_annotated_folder)
 
+          #copy data.yaml file from the Auto_annotated_folder
+          shutil.copyfile(os.path.join(Auto_annotated_folder, 'data.yaml'), os.path.join(Auto_annotated_folder, 'data.yaml'))
 
         #update the distributed folder using the auto-annotated data
         print("Creating distributed folder")
         print(f'num_images_per_instance: {num_images_per_instance}')
-        distributed_datasets = preprocess.distribute_dataset(Auto_annotated_folder, dest_root_folder, num_images_per_instance*0.9, num_images_per_instance*0.1, num_instances, True)
+        distributed_datasets = preprocess.distribute_dataset(Auto_annotated_folder, dest_root_folder, num_images_per_instance*0.9, num_images_per_instance*0.1, num_instances, class_names,True)
         print(f'distributed_datasets {distributed_datasets}')
 
         # Get a list of the distributed datasets directories
