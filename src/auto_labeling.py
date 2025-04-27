@@ -382,9 +382,6 @@ def iterative_auto_labeling(Iterative, main_dataset_dir, num_images_per_instance
 
           preprocess.merge_datasets(auto_annotated_datasets_folders, Auto_annotated_folder)
 
-          #copy data.yaml file from the Auto_annotated_folder
-          shutil.copyfile(os.path.join(Auto_annotated_folder, 'data.yaml'), os.path.join(Auto_annotated_folder, 'data.yaml'))
-
         #update the distributed folder using the auto-annotated data
         print("Creating distributed folder")
         print(f'num_images_per_instance: {num_images_per_instance}')
