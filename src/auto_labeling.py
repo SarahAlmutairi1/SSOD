@@ -332,6 +332,7 @@ def iterative_auto_labeling(Iterative, main_dataset_dir, num_images_per_instance
         # if the final predicted pseudo labels are less than needed no. of images_per_iteration, stop
         if len(os.listdir(output_folder)) < images_per_iteration or Iterative == False:
           iteration += 1
+          print(f"len(os.listdir(output_folder)) : {len(os.listdir(output_folder))} < images_per_iteration: {images_per_iteration}")
           print("Not enough auto-annotated labels to continue.")
           break
 
