@@ -12,6 +12,7 @@ import train
 import evaluate
 import glob
 from collections import Counter
+from ensemble_boxes import weighted_boxes_fusion
 
 def read_predictions_from_file(file_path, image_width, image_height, ScoreBased, ScoreThreshold):
     """
@@ -97,6 +98,64 @@ def compute_iou(box1, box2):
     union_area = box1_area + box2_area - intersection_area
 
     return intersection_area / union_area
+def confidence_weighted_class_voting(class_ids, scores):
+    """
+    Confidence-weighted voting to select final class.
+    """
+    class_confidences = defaultdict(float)
+    for cls_id, score in zip(class_ids, scores):
+        class_confidences[cls_id] += score
+    voted_class = max(class_confidences.items(), key=lambda x: x[1])[0]
+    return voted_class
+
+def weighted_boxes_fusion(predictions, iou_threshold=0.5, image_size=(640, 640)):
+    """
+    Perform Weighted Boxes Fusion (WBF) with Confidence-Weighted Class Voting.
+    Args:
+        predictions: List of (class_id, [xmin, ymin, xmax, ymax], score)
+    Returns:
+        final_predictions: List of (class_id, [xmin, ymin, xmax, ymax], score)
+    """
+    predictions = [pred for pred in predictions if isinstance(pred, tuple) and len(pred) == 3]
+    final_predictions = []
+
+    while predictions:
+        # Sort by score descending
+        predictions.sort(key=lambda x: x[2], reverse=True)
+        best_pred = predictions.pop(0)
+
+        overlapping = [best_pred]
+        remaining = []
+
+        for pred in predictions:
+            iou = compute_iou(best_pred[1], pred[1], image_size)
+            if iou >= iou_threshold:
+                overlapping.append(pred)
+            else:
+                remaining.append(pred)
+
+        predictions = remaining
+
+        # Discard if only one box
+        if len(overlapping) == 1:
+            continue
+
+        # Fuse boxes (weighted average by scores)
+        boxes = np.array([box[1] for box in overlapping])
+        scores = np.array([box[2] for box in overlapping])
+
+        weighted_box = np.average(boxes, axis=0, weights=scores)
+
+        # Class assignment via confidence-weighted voting
+        class_ids = [box[0] for box in overlapping]
+        final_class = confidence_weighted_class_voting(class_ids, scores)
+
+        # Final score is max score among group (or you can average, your choice)
+        final_score = max(scores)
+
+        final_predictions.append((final_class, weighted_box.tolist(), final_score))
+
+    return final_predictions
 
 def non_max_suppression_with_majority(predictions, iou_threshold=0.5):
     """
@@ -168,8 +227,7 @@ def process_predictions(models_folders, image_width, image_height, iou_threshold
     all_predictions = read_all_predictions(models_folders, image_width, image_height, ScoreBased, ScoreThreshold)
     
     for image_file, predictions_list in all_predictions.items():
-        # Apply NMS to filter out redundant boxes
-        aggregated_predictions = non_max_suppression_with_majority(predictions_list, iou_threshold)
+        aggregated_predictions = weighted_boxes_fusion(predictions_list, iou_threshold)
         final_predictions[image_file] = aggregated_predictions
 
     return final_predictions
