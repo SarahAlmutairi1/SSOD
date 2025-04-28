@@ -77,7 +77,7 @@ def read_all_predictions(models_folders, image_width, image_height, ScoreBased, 
 
     return all_predictions
 
-def compute_iou(box1, box2):
+def compute_iou(box1, box2, image_size=(640, 640)):
     """
     Compute the Intersection over Union (IoU) between two bounding boxes.
     Each box is represented by a list [xmin, ymin, xmax, ymax].
@@ -85,7 +85,7 @@ def compute_iou(box1, box2):
     X1a, Y1a, X2a, Y2a = box1
     X1b, Y1b, X2b, Y2b = box2
 
-    W, H = 640, 640
+    W, H = image_size
     VocBox1 = pyb.convert_bbox((X1a, Y1a, X2a, Y2a), from_type="yolo", to_type="voc", image_size=(W, H))
     VocBox2 = pyb.convert_bbox((X1b, Y1b, X2b, Y2b), from_type="yolo", to_type="voc", image_size=(W, H))
 
