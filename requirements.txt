@@ -1,2 +1,3 @@
 ultralytics  # YOLO package
 pybboxes  # Bounding box processing
+ensemble-boxes # Weighted Boxes Fusion
