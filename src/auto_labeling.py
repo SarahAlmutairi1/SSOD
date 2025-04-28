@@ -13,6 +13,7 @@ import evaluate
 import glob
 from collections import Counter
 from ensemble_boxes import weighted_boxes_fusion
+from collections import defaultdict
 
 def read_predictions_from_file(file_path, image_width, image_height, ScoreBased, ScoreThreshold):
     """
