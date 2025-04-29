@@ -158,7 +158,7 @@ def ETSR(Iterative, iteration ,main_dataset_dir, class_names, img_size, num_inst
         sys.exit()
         
     # Train the YOLO model using the auto-annotated labels
-    model, Train_time = train.train_final_model(iteration, Final_auto_annotated_dataset, img_size, 150)
+    model, Train_time = train.train_final_model(iteration, Final_auto_annotated_dataset, img_size, 200)
 
     # Evaluate the model
     metrics = evaluate.evaluate_final_model(model, main_dataset_dir, img_size)
