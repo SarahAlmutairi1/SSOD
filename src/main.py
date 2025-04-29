@@ -158,7 +158,7 @@ def ETSR(Iterative, iteration ,main_dataset_dir, class_names, img_size, num_inst
         sys.exit()
         
     # Train the YOLO model using the auto-annotated labels
-    model, Train_time = train.train_final_model(iteration, Final_auto_annotated_dataset, img_size, 200)
+    model, Train_time = train.train_final_model(iteration, Final_auto_annotated_dataset, img_size, 150)
 
     # Evaluate the model
     metrics = evaluate.evaluate_final_model(model, main_dataset_dir, img_size)
@@ -169,6 +169,7 @@ def ETSR(Iterative, iteration ,main_dataset_dir, class_names, img_size, num_inst
     # del
     shutil.rmtree(f"{HOME}/merged_folder")
     shutil.rmtree(f'{HOME}/Final_auto_annotated_dataset_{iteration}')
+    
 def main():
     main_dataset_dir = f'{HOME}/src/datasets/VOC1'  # dataset path
     output_path = f'{HOME}/output'  # output folder path
@@ -180,8 +181,8 @@ def main():
 
     img_size = 640
     epochs_per_iteration = 30
-    num_instances_list = [3,5,7,9,11]
-    threshold_values = [0.5]
+    num_instances_list = [3]
+    threshold_values = [0.5,0.6,0.7,0.8]
     score_based_options = [False]
     score_thresholds = [0]
 
