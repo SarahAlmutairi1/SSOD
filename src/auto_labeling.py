@@ -99,6 +99,7 @@ def compute_iou(box1, box2, image_size=(640, 640)):
     union_area = box1_area + box2_area - intersection_area
 
     return intersection_area / union_area
+'''
 def confidence_weighted_class_voting(class_ids, scores):
     """
     Confidence-weighted voting to select final class.
@@ -157,7 +158,7 @@ def weighted_boxes_fusion(predictions, iou_threshold=0.5, image_size=(640, 640))
         final_predictions.append((final_class, weighted_box.tolist(), final_score))
 
     return final_predictions
-
+'''
 def non_max_suppression_with_majority(predictions, iou_threshold=0.5):
     """
     Apply Non-Maximum Suppression (NMS) across all boxes regardless of class,
@@ -228,7 +229,7 @@ def process_predictions(models_folders, image_width, image_height, iou_threshold
     all_predictions = read_all_predictions(models_folders, image_width, image_height, ScoreBased, ScoreThreshold)
     
     for image_file, predictions_list in all_predictions.items():
-        aggregated_predictions = weighted_boxes_fusion(predictions_list, iou_threshold)
+        aggregated_predictions = non_max_suppression_with_majority(predictions_list, iou_threshold)
         final_predictions[image_file] = aggregated_predictions
 
     return final_predictions
