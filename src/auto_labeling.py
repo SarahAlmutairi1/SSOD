@@ -419,7 +419,7 @@ def iterative_auto_labeling(Iterative, main_dataset_dir, num_images_per_instance
           os.makedirs(dest_root_folder)
         
         # Every 3 iteratione retrain teachers from the start
-        if RetrainAll and iteration % 3 == 0:
+        if RetrainAll and iteration % 3 == 0 and iteration != 0:
           
           print("Prepare data for retraining all teachers")
           # Define the auto-annotated folder name for the current iteration
