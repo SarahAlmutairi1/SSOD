@@ -17,7 +17,8 @@ def train_single_instance(dataset_path, epochs_per_iteration, model, img_size, i
         if RetrainAll and iteration % 3 == 0:
           print(f"Loading yolov8n.yaml")
           model = YOLO('yolo11n.pt')
-
+        # model = load_model_with_backbone_transfer('yolo11n-cls.pt', 'yolo11n.yaml')  
+        
         elif model is not None:
           print(f"Loading teacher model")
           model = YOLO(model)
@@ -174,3 +175,47 @@ def train_final_model(iteration ,dataset, img_size, train_epochs):
   print(f"Runtime: {runtime:.2f} hr")
 
   return best_model_path, runtime
+    
+def load_model_with_backbone_transfer(cls_model_path, det_model_path, backbone_layer_limit=10):
+    """
+    Load a detection model and initialize its backbone from a classification model only.
+    The detection head will remain randomly initialized.
+    This function is 
+
+    Args:
+        cls_model_path (str): Path to classification model (e.g., 'yolo11n-cls.pt').
+        det_model_path (str): Path to detection model (e.g., 'yolo11n.pt').
+        backbone_layer_limit (int): Number of early layers (assumed backbone) to transfer.
+
+    Returns:
+        YOLO: The initialized detection model with transferred backbone weights only.
+    """
+
+    cls_model_path = 'yolo11n-cls.pt'
+    det_model_path = 'yolo11n.yaml'
+    
+    # Load classification and detection models
+    cls_model = YOLO(cls_model_path)
+    det_model = YOLO(det_model_path)
+
+    cls_state = cls_model.model.state_dict()
+    det_state = det_model.model.state_dict()
+
+    # Identify backbone layer names to transfer (first N layers only)
+    backbone_layer_names = [
+        name for idx, (name, _) in enumerate(det_model.model.named_parameters())
+        if idx < backbone_layer_limit
+    ]
+
+    # Transfer backbone weights
+    transferred = 0
+    for k in backbone_layer_names:
+        if k in cls_state and cls_state[k].shape == det_state[k].shape:
+            det_state[k] = cls_state[k]
+            transferred += 1
+
+    # Load the updated state dict
+    det_model.model.load_state_dict(det_state)
+    print(f"✅ Transferred {transferred} backbone layers from {cls_model_path} to {det_model_path}")
+
+    return det_model
