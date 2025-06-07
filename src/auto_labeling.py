@@ -11,6 +11,7 @@ import preprocess
 import train 
 import evaluate
 import glob
+import math
 from collections import Counter
 from ensemble_boxes import weighted_boxes_fusion
 from collections import defaultdict
@@ -159,12 +160,12 @@ def weighted_boxes_fusion(predictions, iou_threshold=0.5, image_size=(640, 640))
 
     return final_predictions
 '''
-def non_max_suppression_with_majority(predictions, iou_threshold=0.5):
+def non_max_suppression_with_majority(num_instances, predictions, iou_threshold=0.5):
     """
     Apply Non-Maximum Suppression (NMS) across all boxes regardless of class,
     then use majority voting to assign a final class to each selected box.
 
-    A box is only considered if the number of overlapping boxes is at least
+    A predicted box is only considered if the number of overlapping boxes is at least
     half of the total number of predicted boxes.
 
     predictions: List of tuples (class_id, [xmin, ymin, xmax, ymax], score)
@@ -195,8 +196,8 @@ def non_max_suppression_with_majority(predictions, iou_threshold=0.5):
         # Update the list of remaining predictions
         predictions = remaining_predictions
 
-        # Discard boxes if the group size is one box discard it
-        if len(overlapping_boxes) == 1:
+        # Discard the group if the group size is one, neglects highest score box if object was only detected by one teacher
+        if len(overlapping_boxes) >= math.ceil(0.5 * num_instances):
             continue  # Skip adding this box to final predictions
 
         # Majority voting for class assignment
@@ -215,7 +216,7 @@ def non_max_suppression_with_majority(predictions, iou_threshold=0.5):
     return final_predictions
 
 
-def process_predictions(models_folders, image_width, image_height, iou_threshold=0.5, ScoreBased = True, ScoreThreshold = 0.6):
+def process_predictions(num_instances, models_folders, image_width, image_height, iou_threshold=0.5, ScoreBased = True, ScoreThreshold = 0.6):
     """
     Process predictions from multiple model folders using Non-Maximum Suppression (NMS).
     models_folders: List of folder paths for each model
@@ -229,7 +230,7 @@ def process_predictions(models_folders, image_width, image_height, iou_threshold
     all_predictions = read_all_predictions(models_folders, image_width, image_height, ScoreBased, ScoreThreshold)
     
     for image_file, predictions_list in all_predictions.items():
-        aggregated_predictions = non_max_suppression_with_majority(predictions_list, iou_threshold)
+        aggregated_predictions = non_max_suppression_with_majority(num_instances, predictions_list, iou_threshold)
         final_predictions[image_file] = aggregated_predictions
 
     return final_predictions
@@ -380,7 +381,7 @@ def iterative_auto_labeling(Iterative, main_dataset_dir, num_images_per_instance
         Pseudo_labels_folders = train.Pseudo_Labeling(best_model_paths, unlabeled_dataset, iteration)
         
         # Process the predictions from the Pseudo Labeling
-        final_predictions = process_predictions(Pseudo_labels_folders, image_width = img_size, image_height = img_size, iou_threshold = threshold_val, ScoreBased = ScoreBased, ScoreThreshold = ScoreThreshold )
+        final_predictions = process_predictions(num_instances, Pseudo_labels_folders, image_width = img_size, image_height = img_size, iou_threshold = threshold_val, ScoreBased = ScoreBased, ScoreThreshold = ScoreThreshold )
         final_predictions_list.append(final_predictions)
 
         # Save final predictions
@@ -468,7 +469,7 @@ def iterative_auto_labeling(Iterative, main_dataset_dir, num_images_per_instance
       Pseudo_labels_folders = train.Pseudo_Labeling(best_model_paths, unlabeled_images_folder, iteration)
         
       # Process the predictions from the Pseudo Labeling
-      final_predictions = process_predictions(Pseudo_labels_folders, image_width = img_size, image_height = img_size, iou_threshold = threshold_val, ScoreBased = ScoreBased, ScoreThreshold = ScoreThreshold )
+      final_predictions = process_predictions(num_instances, Pseudo_labels_folders, image_width = img_size, image_height = img_size, iou_threshold = threshold_val, ScoreBased = ScoreBased, ScoreThreshold = ScoreThreshold )
 
       final_predictions_list.append(final_predictions)
       print(f'number of final predictions is {len(final_predictions)}')
