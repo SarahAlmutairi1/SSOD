@@ -12,9 +12,8 @@ import train
 import evaluate
 import glob
 import math
-from collections import Counter
 from ensemble_boxes import weighted_boxes_fusion
-from collections import defaultdict
+from collections import defaultdict, Counter
 
 def read_predictions_from_file(file_path, image_width, image_height, ScoreBased, ScoreThreshold):
     """
@@ -159,7 +158,7 @@ def weighted_boxes_fusion(predictions, iou_threshold=0.5, image_size=(640, 640))
         final_predictions.append((final_class, weighted_box.tolist(), final_score))
 
     return final_predictions
-'''
+
 def non_max_suppression_with_majority(num_instances, predictions, iou_threshold=0.5):
     """
     Apply Non-Maximum Suppression (NMS) across all boxes regardless of class,
@@ -197,7 +196,7 @@ def non_max_suppression_with_majority(num_instances, predictions, iou_threshold=
         predictions = remaining_predictions
 
         # Discard the group if the group size is one, neglects highest score box if object was only detected by one teacher
-        if len(overlapping_boxes) >= math.ceil(0.5 * num_instances):
+        if len(overlapping_boxes) == 1:
             continue  # Skip adding this box to final predictions
 
         # Majority voting for class assignment
@@ -212,6 +211,69 @@ def non_max_suppression_with_majority(num_instances, predictions, iou_threshold=
         final_score = best_pred[2]
 
         final_predictions.append((majority_class, avg_box, final_score))
+
+    return final_predictions
+'''
+def combined_fusion(num_teachers, predictions, iou_threshold=0.5, image_size=(640, 640)):
+    """
+    Hybrid method: NMS + Confidence-Weighted Fusion + Agreement Filtering.
+    
+    Args:
+        predictions: List of (class_id, [xmin, ymin, xmax, ymax], score)
+        num_teachers: Number of teacher models used
+    Returns:
+        final_predictions: List of (class_id, [xmin, ymin, xmax, ymax], score)
+    """
+
+
+    # Validate predictions
+    predictions = [
+        pred for pred in predictions
+        if isinstance(pred, tuple) and len(pred) == 3 and isinstance(pred[2], (int, float))
+    ]
+
+    final_predictions = []
+
+    while predictions:
+        # Sort by confidence
+        predictions.sort(key=lambda x: x[2], reverse=True)
+        best_pred = predictions.pop(0)
+
+        # Group overlapping boxes
+        overlapping = [best_pred]
+        remaining = []
+
+        for pred in predictions:
+            iou = compute_iou(best_pred[1], pred[1], image_size=image_size)
+            if iou >= iou_threshold:
+                overlapping.append(pred)
+            else:
+                remaining.append(pred)
+
+        predictions = remaining
+
+        # Require group agreement (i.e., detection by ≥50% of teachers)
+        if len(overlapping) < math.ceil(0.5 * num_teachers):
+            continue
+
+        # Extract components
+        boxes = np.array([box[1] for box in overlapping])
+        scores = np.array([box[2] for box in overlapping])
+        class_ids = [box[0] for box in overlapping]
+
+        # Confidence-weighted fusion
+        weighted_box = np.average(boxes, axis=0, weights=scores)
+
+        # Confidence-weighted class voting
+        class_confidences = defaultdict(float)
+        for cls, score in zip(class_ids, scores):
+            class_confidences[cls] += score
+        final_class = max(class_confidences.items(), key=lambda x: x[1])[0]
+
+        # Final score (could also be np.mean(scores) or another function)
+        final_score = max(scores)
+
+        final_predictions.append((final_class, weighted_box.tolist(), final_score))
 
     return final_predictions
 
