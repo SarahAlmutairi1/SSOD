@@ -292,7 +292,7 @@ def process_predictions(num_instances, models_folders, image_width, image_height
     all_predictions = read_all_predictions(models_folders, image_width, image_height, ScoreBased, ScoreThreshold)
     
     for image_file, predictions_list in all_predictions.items():
-        aggregated_predictions = non_max_suppression_with_majority(num_instances, predictions_list, iou_threshold)
+        aggregated_predictions = combined_fusion(num_instances, predictions_list, iou_threshold)
         final_predictions[image_file] = aggregated_predictions
 
     return final_predictions
