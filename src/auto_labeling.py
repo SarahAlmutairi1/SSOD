@@ -253,7 +253,7 @@ def combined_fusion(num_teachers, predictions, iou_threshold=0.5, image_size=(64
         predictions = remaining
 
         # Require group agreement (i.e., detection by ≥50% of teachers)
-        if len(overlapping) < math.ceil(0.5 * num_teachers):
+        if len(overlapping) <= math.ceil(0.5 * num_teachers):
             continue
         
         # Extract components
