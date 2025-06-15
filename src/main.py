@@ -13,6 +13,8 @@ from datetime import datetime
 import subprocess
 import sys
 import torch.multiprocessing as mp
+import os
+
 
 def save_output_file():
     # Define local file path 
@@ -171,6 +173,7 @@ def ETSR(Iterative, iteration ,main_dataset_dir, class_names, img_size, num_inst
     shutil.rmtree(f'{HOME}/Final_auto_annotated_dataset_{iteration}')
     
 def main():
+    os.environ["WANDB_MODE"] = "disabled"
     main_dataset_dir = f'{HOME}/src/datasets/VOC1'  # dataset path
     output_path = f'{HOME}/output'  # output folder path
 
