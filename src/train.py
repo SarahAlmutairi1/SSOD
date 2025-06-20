@@ -162,7 +162,7 @@ def train_final_model(iteration ,dataset, img_size, train_epochs):
   #Train the model
   print("Training final model...")
   model = YOLO('yolo11n.pt')
-  results = model.train(data=f'{dataset}/data.yaml', epochs=train_epochs, imgsz=img_size, plots=True, augment=True, patience = 20, project=f'{HOME}/Final_runs', name=f'Final_model_runs_{iteration}')
+  results = model.train(data=f'{dataset}/data.yaml', epochs=train_epochs, imgsz=img_size, plots=True, augment=True, patience = 20, project='Final_runs', name=f'Final_model_runs_{iteration}')
   save_dir = results.save_dir  # Get the save directory
 
   # Path to the best model
