@@ -28,7 +28,7 @@ def train_single_instance(dataset_path, epochs_per_iteration, model, img_size, i
           model = YOLO('yolo11n.pt')
 
         # Train the model
-        results = model.train(data=f'{dataset_path}/data.yaml', epochs=epochs_per_iteration, imgsz=img_size, plots=True, patience = 10, augment=True, project=f'{HOME}/runs') 
+        results = model.train(data=f'{dataset_path}/data.yaml', epochs=epochs_per_iteration, imgsz=img_size, plots=True, patience = 10, augment=True, project='runs') 
         save_dir = results.save_dir  # Get the save directory
 
         print(f"Model saved to: {save_dir}")
